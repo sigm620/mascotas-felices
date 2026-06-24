@@ -1,0 +1,38 @@
+"Quiero implementar un sistema de misiones semanales con la siguiente lógica completa:
+ESTRUCTURA BASE DE MISIONES:
+
+Cada semana el niño tiene entre 5 y 7 misiones en total
+Las misiones se reinician cada lunes automáticamente
+Cada misión completada da monedas y también sube un stat de la mascota (felicidad, salud o energía según el tipo de misión)
+Mostrar una barra de progreso semanal visible para que el niño vea cuánto le falta
+
+TIPOS DE MISIONES:
+1. MISIONES FIJAS DEL SISTEMA (no las puede borrar nadie, siempre aparecen):
+
+"Juega un minijuego hoy" — se completa al jugar cualquier minijuego 1 vez
+"Alcanza 100 puntos en cualquier minijuego" — se completa al lograr ese puntaje
+"Cuida a tu mascota 3 días seguidos" — se completa al abrir la app 3 días consecutivos
+
+2. MISIONES CREADAS POR LOS PADRES:
+
+Los padres pueden crear máximo 4 misiones personalizadas por semana
+Cada misión tiene: nombre, descripción corta, ícono (elegir de una lista de 10 íconos predefinidos: libro, escoba, plato, mochila, flor, lápiz, estrella, corazón, casa, pelota), recompensa fija de monedas (entre 10 y 50, en saltos de 10)
+El padre marca la misión como completada desde su panel, NO el niño, para evitar trampa
+Si el padre no usa la app esa semana y no crea misiones, el niño igual tiene las misiones fijas del sistema para no quedarse sin nada
+
+3. MISIONES DE MINIJUEGOS:
+
+"Juega [nombre del minijuego] 2 veces esta semana"
+"Alcanza [X puntaje] en [nombre del minijuego]"
+Estas se generan automáticamente cada semana rotando entre los minijuegos disponibles para que no sean siempre las mismas
+
+LÓGICA ANTI-VARIABILIDAD (importante para consistencia de datos):
+
+Máximo 4 misiones de padres por semana — si intentan crear una quinta, mostrar mensaje: "Ya alcanzaste el límite semanal de misiones"
+Todas las misiones tienen recompensas dentro de rangos fijos para que ningún niño acumule monedas mucho más rápido que otro
+Guardar registro de cada misión completada con fecha y hora para análisis posterior
+
+PANEL DE DATOS PARA LA INVESTIGACIÓN:
+
+Guardar en base de datos: qué misiones completó cada niño, en qué fecha, cuántas misiones crearon los padres por semana, cuántos días seguidos usó la app el niño
+Estos datos deben poder exportarse en formato CSV o tabla simple desde el panel del administrador"

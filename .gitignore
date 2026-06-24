@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+server/public/
+
+# Variables de entorno (¡NUNCA subas esto a GitHub!)
+.env
+.env.local
+.env.production
+
+# Sistema
+.DS_Store
+*.tar.gz
+
+# TypeScript cache
+vite.config.ts.*
+node_modules/typescript/tsbuildinfo

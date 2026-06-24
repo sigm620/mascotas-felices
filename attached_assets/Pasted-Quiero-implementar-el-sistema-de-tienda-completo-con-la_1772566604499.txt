@@ -1,0 +1,56 @@
+Quiero implementar el sistema de tienda completo con la siguiente lógica:
+OBJETOS PERMANENTES (se compran una sola vez, aparecen visualmente en la pantalla de la mascota):
+1. CUENCOS (solo uno activo a la vez, el nuevo reemplaza al anterior):
+
+Cuenco básico: 80 monedas, efecto permanente: cada vez que se da comida sube +10 puntos extra de hambre
+Cuenco especial: 150 monedas, efecto permanente: cada vez que se da comida sube +20 puntos extra de hambre
+El cuenco debe aparecer visualmente en la pantalla junto a la mascota, en la parte inferior izquierda
+
+2. CASITAS (solo una activa a la vez, la nueva reemplaza a la anterior):
+
+Casita básica: 120 monedas, efecto permanente: la energía de la mascota se recupera +10 puntos extra cada noche (entre 8pm y 6am según la hora real del dispositivo)
+Casita bonita: 200 monedas, efecto permanente: la energía se recupera +20 puntos extra cada noche
+La casita debe aparecer visualmente en la pantalla en la parte inferior derecha
+
+CONSUMIBLES (desaparecen al usarse, se pueden comprar múltiples veces, máximo 10 unidades de cada uno en inventario):
+
+Comida básica: 10 monedas, +30 hambre
+Snack especial: 15 monedas, +40 hambre
+Pelota: 10 monedas, +30 felicidad, mostrar animación breve de la mascota jugando
+Cuerda: 10 monedas, +30 felicidad, mostrar animación breve de la mascota jugando
+Medicina: 15 monedas, +30 salud
+
+DIFERENCIAS VISUALES ENTRE OBJETOS:
+CUENCOS:
+
+Cuenco básico: cuenco pequeño y simple, color gris o beige, sin detalles
+Cuenco especial: cuenco más grande, color brillante azul o verde, con una huellita decorativa en el lado
+
+CASITAS:
+
+Sin casita: fondo es un parque simple, pasto verde liso y cielo azul claro
+Casita básica: casita pequeña de madera, techo rojo simple, una ventana, fondo con pasto y algunos arbustos
+Casita bonita: casita más grande, techo con tejas de colores, dos ventanas con flores, jardín con flores alrededor, fondo con árboles y nubes esponjosas
+
+Cada objeto más caro debe verse notablemente más elaborado que el anterior — más colores, más detalles, más grande — para que el niño sienta que valió la pena ahorrar
+LÓGICA DE LA TIENDA:
+
+Mostrar claramente qué objetos permanentes ya fueron comprados con un sello de "✓ comprado" y no permitir comprarlos de nuevo
+Para los consumibles, mostrar un botón de cantidad con + y - para comprar varios a la vez
+Antes de confirmar cualquier compra mostrar un popup de confirmación: "¿Seguro que quieres comprar [objeto] por [precio] monedas?"
+Si el niño no tiene suficientes monedas, el botón aparece bloqueado con un candado y un mensaje: "Te faltan X monedas"
+Al comprar un objeto permanente, este aparece inmediatamente en la pantalla de la mascota sin necesidad de reiniciar
+
+INVENTARIO:
+
+El niño puede ver en su inventario cuántos consumibles tiene guardados
+Los consumibles comprados se guardan y se usan desde el inventario, no desaparecen hasta que el niño los use
+Máximo 10 unidades de cada consumible para no acumular infinito
+
+VISUAL DE LA PANTALLA PRINCIPAL DE LA MASCOTA:
+
+Fondo dinámico según la casita que tenga el niño
+Casita visible en la esquina inferior derecha
+Cuenco visible en la esquina inferior izquierda
+Mascota animada en el centro, que se mueve por la pantalla y se voltea según la dirección en que camina
+Todo debe guardarse en la base de datos para que al cerrar y abrir la app todo siga igual"

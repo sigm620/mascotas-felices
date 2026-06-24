@@ -1,0 +1,566 @@
+import React, { useState, useEffect } from 'react';
+import { Heart, Smile, Droplets, Star, Check, X, Lock, Unlock, Trophy, Gamepad2 } from 'lucide-react';
+
+export default function PetCareApp() {
+  const [view, setView] = useState('child');
+  const [gameView, setGameView] = useState(null);
+  const [pet, setPet] = useState({
+    name: 'Fluffy',
+    type: '🐶',
+    hunger: 70,
+    happiness: 60,
+    health: 80,
+    level: 1
+  });
+
+  const [inventory, setInventory] = useState({
+    food: 3,
+    toys: 2,
+    medicine: 1
+  });
+
+  const [missions, setMissions] = useState([
+    { id: 1, title: 'Estudiar matemáticas', duration: '30 min', points: 50, completed: false, approved: false },
+    { id: 2, title: 'Ordenar mi habitación', duration: '15 min', points: 30, completed: false, approved: false },
+    { id: 3, title: 'Leer un libro', duration: '20 min', points: 40, completed: false, approved: false },
+    { id: 4, title: 'Ayudar a poner la mesa', duration: '10 min', points: 20, completed: false, approved: false },
+    { id: 5, title: 'Hacer ejercicio', duration: '15 min', points: 35, completed: false, approved: false }
+  ]);
+
+  const [points, setPoints] = useState(150);
+
+  // JUEGO DE MEMORIA
+  const [memoryCards, setMemoryCards] = useState([]);
+  const [flippedCards, setFlippedCards] = useState([]);
+  const [matchedCards, setMatchedCards] = useState([]);
+  const [memoryMoves, setMemoryMoves] = useState(0);
+
+  // JUEGO DE ATRAPAR
+  const [catchGame, setCatchGame] = useState({
+    score: 0,
+    timeLeft: 30,
+    items: [],
+    isPlaying: false
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPet(prev => ({
+        ...prev,
+        hunger: Math.max(0, prev.hunger - 1),
+        happiness: Math.max(0, prev.happiness - 1),
+        health: Math.max(0, prev.health - 0.5)
+      }));
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const feedPet = () => {
+    if (inventory.food > 0) {
+      setInventory(prev => ({ ...prev, food: prev.food - 1 }));
+      setPet(prev => ({ ...prev, hunger: Math.min(100, prev.hunger + 30) }));
+    }
+  };
+
+  const playWithPet = () => {
+    if (inventory.toys > 0) {
+      setPet(prev => ({ 
+        ...prev, 
+        happiness: Math.min(100, prev.happiness + 25),
+        hunger: Math.max(0, prev.hunger - 5)
+      }));
+    }
+  };
+
+  const healPet = () => {
+    if (inventory.medicine > 0) {
+      setInventory(prev => ({ ...prev, medicine: prev.medicine - 1 }));
+      setPet(prev => ({ ...prev, health: Math.min(100, prev.health + 40) }));
+    }
+  };
+
+  const buyItem = (item, cost) => {
+    if (points >= cost) {
+      setPoints(prev => prev - cost);
+      setInventory(prev => ({ ...prev, [item]: prev[item] + 1 }));
+    }
+  };
+
+  const markMissionCompleted = (id) => {
+    setMissions(missions.map(m => 
+      m.id === id ? { ...m, completed: true } : m
+    ));
+  };
+
+  const approveMission = (id, approve) => {
+    const mission = missions.find(m => m.id === id);
+    if (approve && mission) {
+      setPoints(prev => prev + mission.points);
+    }
+    setMissions(missions.map(m => 
+      m.id === id ? { ...m, approved: approve, completed: false } : m
+    ));
+  };
+
+  const getStatusColor = (value) => {
+    if (value > 70) return 'bg-green-500';
+    if (value > 40) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const getPetMood = () => {
+    const avg = (pet.hunger + pet.happiness + pet.health) / 3;
+    if (avg > 70) return '😊';
+    if (avg > 40) return '😐';
+    return '😢';
+  };
+
+  // INICIAR JUEGO DE MEMORIA
+  const startMemoryGame = () => {
+    const emojis = ['🍎', '🍌', '🍇', '🍓', '🍉', '🍊'];
+    const cards = [...emojis, ...emojis]
+      .sort(() => Math.random() - 0.5)
+      .map((emoji, idx) => ({ id: idx, emoji, flipped: false }));
+    setMemoryCards(cards);
+    setFlippedCards([]);
+    setMatchedCards([]);
+    setMemoryMoves(0);
+    setGameView('memory');
+  };
+
+  const flipCard = (id) => {
+    if (flippedCards.length === 2 || flippedCards.includes(id) || matchedCards.includes(id)) return;
+    
+    const newFlipped = [...flippedCards, id];
+    setFlippedCards(newFlipped);
+
+    if (newFlipped.length === 2) {
+      setMemoryMoves(prev => prev + 1);
+      const [first, second] = newFlipped;
+      const firstCard = memoryCards.find(c => c.id === first);
+      const secondCard = memoryCards.find(c => c.id === second);
+
+      if (firstCard.emoji === secondCard.emoji) {
+        setMatchedCards(prev => [...prev, first, second]);
+        setFlippedCards([]);
+        
+        if (matchedCards.length + 2 === memoryCards.length) {
+          setTimeout(() => {
+            setPoints(prev => prev + 50);
+            setPet(prev => ({ ...prev, happiness: Math.min(100, prev.happiness + 15) }));
+            alert('¡Ganaste! +50 puntos ⭐');
+            setGameView(null);
+          }, 500);
+        }
+      } else {
+        setTimeout(() => setFlippedCards([]), 1000);
+      }
+    }
+  };
+
+  // JUEGO DE ATRAPAR
+  const startCatchGame = () => {
+    setCatchGame({
+      score: 0,
+      timeLeft: 30,
+      items: [],
+      isPlaying: true
+    });
+    setGameView('catch');
+  };
+
+  useEffect(() => {
+    if (catchGame.isPlaying && gameView === 'catch') {
+      const timer = setInterval(() => {
+        setCatchGame(prev => {
+          if (prev.timeLeft <= 0) {
+            clearInterval(timer);
+            setPoints(p => p + prev.score * 2);
+            setPet(pt => ({ ...pt, happiness: Math.min(100, pt.happiness + 10) }));
+            alert(`¡Juego terminado! Puntuación: ${prev.score}\n+${prev.score * 2} puntos ⭐`);
+            setGameView(null);
+            return { ...prev, isPlaying: false };
+          }
+          return { ...prev, timeLeft: prev.timeLeft - 1 };
+        });
+      }, 1000);
+
+      const itemSpawner = setInterval(() => {
+        setCatchGame(prev => ({
+          ...prev,
+          items: [...prev.items, {
+            id: Date.now(),
+            emoji: ['🍎', '🍌', '🍓', '⭐', '💎'][Math.floor(Math.random() * 5)],
+            x: Math.random() * 80,
+            y: 0
+          }]
+        }));
+      }, 800);
+
+      return () => {
+        clearInterval(timer);
+        clearInterval(itemSpawner);
+      };
+    }
+  }, [catchGame.isPlaying, gameView]);
+
+  const catchItem = (id) => {
+    setCatchGame(prev => ({
+      ...prev,
+      score: prev.score + 1,
+      items: prev.items.filter(item => item.id !== id)
+    }));
+  };
+
+  if (gameView === 'memory') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-3xl shadow-2xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-purple-600">🧠 Juego de Memoria</h2>
+              <button onClick={() => setGameView(null)} className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">
+                Salir
+              </button>
+            </div>
+            <p className="text-center mb-4 text-gray-600">Movimientos: {memoryMoves}</p>
+            <div className="grid grid-cols-4 gap-3">
+              {memoryCards.map(card => (
+                <button
+                  key={card.id}
+                  onClick={() => flipCard(card.id)}
+                  className={`aspect-square rounded-xl text-4xl font-bold transition-all transform ${
+                    flippedCards.includes(card.id) || matchedCards.includes(card.id)
+                      ? 'bg-white border-4 border-purple-500'
+                      : 'bg-gradient-to-br from-purple-500 to-pink-500 hover:scale-105'
+                  }`}
+                >
+                  {(flippedCards.includes(card.id) || matchedCards.includes(card.id)) ? card.emoji : '❓'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameView === 'catch') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-400 via-cyan-300 to-green-400 p-4 overflow-hidden">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 relative" style={{ height: '600px' }}>
+            <div className="flex justify-between items-center mb-4">
+              <div className="text-xl font-bold">⏱️ {catchGame.timeLeft}s</div>
+              <div className="text-xl font-bold text-purple-600">🎯 {catchGame.score}</div>
+              <button onClick={() => setGameView(null)} className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">
+                Salir
+              </button>
+            </div>
+            <div className="text-center mb-4">
+              <p className="text-lg font-semibold">¡Atrapa los objetos!</p>
+            </div>
+            <div className="relative" style={{ height: '450px' }}>
+              {catchGame.items.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => catchItem(item.id)}
+                  className="absolute text-4xl hover:scale-125 transition-transform animate-bounce"
+                  style={{
+                    left: `${item.x}%`,
+                    top: `${Math.min(item.y, 90)}%`,
+                    animation: 'fall 3s linear'
+                  }}
+                >
+                  {item.emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 p-4">
+      <div className="max-w-4xl mx-auto mb-4 flex gap-2">
+        <button
+          onClick={() => setView('child')}
+          className={`flex-1 py-2 px-4 rounded-lg font-bold transition ${
+            view === 'child' ? 'bg-white text-purple-600 shadow-lg' : 'bg-white/50 text-white'
+          }`}
+        >
+          👶 Vista Niño
+        </button>
+        <button
+          onClick={() => setView('parent')}
+          className={`flex-1 py-2 px-4 rounded-lg font-bold transition ${
+            view === 'parent' ? 'bg-white text-purple-600 shadow-lg' : 'bg-white/50 text-white'
+          }`}
+        >
+          👨‍👩‍👧 Vista Padres
+        </button>
+      </div>
+
+      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+        {view === 'child' ? (
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold text-purple-600">Mi Mascota</h1>
+              <div className="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full">
+                <Star className="text-yellow-500" fill="currentColor" />
+                <span className="font-bold text-lg">{points}</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-8 mb-6 text-center">
+              <div className="text-8xl mb-4 animate-bounce">{pet.type}</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">{pet.name}</h2>
+              <div className="text-4xl mb-4">{getPetMood()}</div>
+              
+              <div className="space-y-3">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-semibold flex items-center gap-1">
+                      <Droplets size={16} /> Hambre
+                    </span>
+                    <span className="text-sm font-bold">{Math.round(pet.hunger)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className={`h-3 rounded-full transition-all ${getStatusColor(pet.hunger)}`} 
+                         style={{ width: `${pet.hunger}%` }} />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-semibold flex items-center gap-1">
+                      <Smile size={16} /> Felicidad
+                    </span>
+                    <span className="text-sm font-bold">{Math.round(pet.happiness)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className={`h-3 rounded-full transition-all ${getStatusColor(pet.happiness)}`} 
+                         style={{ width: `${pet.happiness}%` }} />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-semibold flex items-center gap-1">
+                      <Heart size={16} /> Salud
+                    </span>
+                    <span className="text-sm font-bold">{Math.round(pet.health)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className={`h-3 rounded-full transition-all ${getStatusColor(pet.health)}`} 
+                         style={{ width: `${pet.health}%` }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <button
+                onClick={feedPet}
+                disabled={inventory.food === 0}
+                className="bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white font-bold py-4 px-3 rounded-xl transition"
+              >
+                <div className="text-2xl mb-1">🍖</div>
+                <div className="text-xs">Alimentar</div>
+                <div className="text-xs">({inventory.food})</div>
+              </button>
+              
+              <button
+                onClick={playWithPet}
+                disabled={inventory.toys === 0}
+                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white font-bold py-4 px-3 rounded-xl transition"
+              >
+                <div className="text-2xl mb-1">🎾</div>
+                <div className="text-xs">Jugar</div>
+                <div className="text-xs">({inventory.toys})</div>
+              </button>
+              
+              <button
+                onClick={healPet}
+                disabled={inventory.medicine === 0}
+                className="bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white font-bold py-4 px-3 rounded-xl transition"
+              >
+                <div className="text-2xl mb-1">💊</div>
+                <div className="text-xs">Curar</div>
+                <div className="text-xs">({inventory.medicine})</div>
+              </button>
+            </div>
+
+            {/* SECCIÓN DE MINI-JUEGOS */}
+            <div className="bg-gradient-to-r from-orange-100 to-pink-100 rounded-2xl p-4 mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
+                <Gamepad2 className="text-orange-500" />
+                🎮 Mini-Juegos
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={startMemoryGame}
+                  className="bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-6 px-4 rounded-xl transition transform hover:scale-105"
+                >
+                  <div className="text-3xl mb-2">🧠</div>
+                  <div className="text-sm">Memoria</div>
+                  <div className="text-xs opacity-80">+50 ⭐</div>
+                </button>
+                
+                <button
+                  onClick={startCatchGame}
+                  className="bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-6 px-4 rounded-xl transition transform hover:scale-105"
+                >
+                  <div className="text-3xl mb-2">🎯</div>
+                  <div className="text-sm">Atrapar</div>
+                  <div className="text-xs opacity-80">Puntos x2</div>
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 rounded-2xl p-4 mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3">🛒 Tienda</h3>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => buyItem('food', 30)}
+                  className="bg-white border-2 border-green-500 hover:bg-green-50 p-3 rounded-lg transition"
+                >
+                  <div className="text-2xl mb-1">🍖</div>
+                  <div className="text-xs font-bold">30 ⭐</div>
+                </button>
+                
+                <button
+                  onClick={() => buyItem('toys', 40)}
+                  className="bg-white border-2 border-blue-500 hover:bg-blue-50 p-3 rounded-lg transition"
+                >
+                  <div className="text-2xl mb-1">🎾</div>
+                  <div className="text-xs font-bold">40 ⭐</div>
+                </button>
+                
+                <button
+                  onClick={() => buyItem('medicine', 50)}
+                  className="bg-white border-2 border-red-500 hover:bg-red-50 p-3 rounded-lg transition"
+                >
+                  <div className="text-2xl mb-1">💊</div>
+                  <div className="text-xs font-bold">50 ⭐</div>
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-purple-50 rounded-2xl p-4">
+              <h3 className="text-xl font-bold text-gray-800 mb-3">📋 Mis Misiones</h3>
+              <div className="space-y-2">
+                {missions.filter(m => !m.approved).map(mission => (
+                  <div key={mission.id} className="bg-white p-3 rounded-lg flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="font-semibold text-sm">{mission.title}</div>
+                      <div className="text-xs text-gray-500">{mission.duration} • {mission.points} ⭐</div>
+                    </div>
+                    {mission.completed ? (
+                      <div className="flex items-center gap-1 text-yellow-600 text-sm">
+                        <Lock size={16} />
+                        <span className="font-semibold">Esperando papá/mamá</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => markMissionCompleted(mission.id)}
+                        className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-bold transition"
+                      >
+                        ✓ Hecha
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Unlock className="text-purple-600" />
+              <h1 className="text-3xl font-bold text-purple-600">Panel de Padres</h1>
+            </div>
+
+            <div className="bg-blue-50 rounded-2xl p-4 mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-3">Estado de {pet.name}</h3>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-3xl mb-1">🍖</div>
+                  <div className="text-sm font-semibold">Hambre</div>
+                  <div className="text-2xl font-bold">{Math.round(pet.hunger)}%</div>
+                </div>
+                <div>
+                  <div className="text-3xl mb-1">😊</div>
+                  <div className="text-sm font-semibold">Felicidad</div>
+                  <div className="text-2xl font-bold">{Math.round(pet.happiness)}%</div>
+                </div>
+                <div>
+                  <div className="text-3xl mb-1">❤️</div>
+                  <div className="text-sm font-semibold">Salud</div>
+                  <div className="text-2xl font-bold">{Math.round(pet.health)}%</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-purple-50 rounded-2xl p-4">
+              <h3 className="text-xl font-bold text-gray-800 mb-3">✅ Validar Misiones</h3>
+              <p className="text-sm text-gray-600 mb-4">Aprueba las misiones que tu hijo/a completó:</p>
+              
+              <div className="space-y-3">
+                {missions.filter(m => m.completed && !m.approved).length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    No hay misiones pendientes de validar
+                  </div>
+                ) : (
+                  missions.filter(m => m.completed && !m.approved).map(mission => (
+                    <div key={mission.id} className="bg-white p-4 rounded-lg border-2 border-yellow-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="font-bold text-base">{mission.title}</div>
+                          <div className="text-sm text-gray-600">{mission.duration}</div>
+                        </div>
+                        <div className="text-lg font-bold text-purple-600">+{mission.points} ⭐</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => approveMission(mission.id, true)}
+                          className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
+                        >
+                          <Check size={18} />
+                          Aprobar
+                        </button>
+                        <button
+                          onClick={() => approveMission(mission.id, false)}
+                          className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition"
+                        >
+                          <X size={18} />
+                          Rechazar
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div className="mt-6 bg-white p-4 rounded-lg">
+                <h4 className="font-bold mb-2">📊 Resumen Semanal</h4>
+                <div className="text-sm text-gray-600">
+                  <div className="flex justify-between py-1">
+                    <span>Misiones completadas:</span>
+                    <span className="font-bold">{missions.filter(m => m.approved === true).length} / {missions.length}</span>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span>Puntos ganados esta semana:</span>
+                    <span className="font-bold text-purple-600">{points} ⭐</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
