@@ -394,13 +394,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const familyId = req.session.familyId!;
       const userId = req.session.userId!;
-      const [pet, inventory, gameState, achievementList, cosmeticsList] = await Promise.all([
+      let [pet, inventory, gameState, achievementList, cosmeticsList] = await Promise.all([
         storage.getPet(familyId),
         storage.getInventory(familyId),
         storage.getGameState(familyId),
         storage.getAchievements(familyId),
         storage.getOwnedCosmetics(familyId),
       ]);
+
+      // Auto-inicializar datos si no existen (por ejemplo si el hijo se unió antes que el padre)
+      if (!pet) {
+        pet = await storage.createPet({ familyId, name: 'Pelusa', type: '🐶', hunger: 70, happiness: 60, health: 80, level: 1 });
+      }
+      if (!inventory) {
+        inventory = await storage.createInventory({ familyId, food: 0, toys: 0, medicine: 1, basicFood: 3, snack: 0, ball: 1, rope: 1 });
+      }
+      if (!gameState) {
+        gameState = await storage.createGameState({ familyId, points: 150 });
+      }
 
       if (gameState && pet) {
         const now = new Date();
