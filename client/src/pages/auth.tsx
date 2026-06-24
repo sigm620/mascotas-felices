@@ -1,59 +1,58 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
 
-type AuthMode = 'login' | 'register' | 'join';
+type Mode = 'login' | 'register' | 'join';
 
-interface AuthPageProps {
-  onSuccess: () => void;
-}
-
-export default function AuthPage({ onSuccess }: AuthPageProps) {
-  const { toast } = useToast();
-  const [mode, setMode] = useState<AuthMode>('login');
+export default function Auth() {
+  const [mode, setMode] = useState<Mode>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'parent' | 'child'>('child');
   const [familyCode, setFamilyCode] = useState('');
 
-  const loginMutation = useMutation({
-    mutationFn: async () => apiRequest('POST', '/api/auth/login', { username, password }),
-    onSuccess: () => {
-      onSuccess();
-    },
-    onError: (err: any) => {
-      toast({ title: 'Error al iniciar sesión', description: err.message || 'Credenciales inválidas', variant: 'destructive' });
-    },
-  });
-
-  const registerMutation = useMutation({
-    mutationFn: async () => apiRequest('POST', '/api/auth/register', { username, password, role }),
-    onSuccess: () => {
-      onSuccess();
-    },
-    onError: (err: any) => {
-      toast({ title: 'Error al registrarse', description: err.message || 'No se pudo registrar', variant: 'destructive' });
-    },
-  });
-
-  const joinMutation = useMutation({
-    mutationFn: async () => apiRequest('POST', '/api/auth/join-family', { username, password, role, familyId: familyCode }),
-    onSuccess: () => {
-      onSuccess();
-    },
-    onError: (err: any) => {
-      toast({ title: 'No se pudo unir a la familia', description: err.message || 'Verifica el código familiar', variant: 'destructive' });
-    },
-  });
+  // En "Nueva Familia" siempre es padre. En "Unirse" se elige.
+  const [joinRole, setJoinRole] = useState<'parent' | 'child'>('child');
 
   const isPending = loginMutation.isPending || registerMutation.isPending || joinMutation.isPending;
 
+  const loginMutation = useMutation({
+    mutationFn: async () => apiRequest('POST', '/api/auth/login', { username, password }),
+    onSuccess: () => window.location.reload(),
+    onError: (e: Error) => alert(e.message),
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: async () =>
+      apiRequest('POST', '/api/auth/register', { username, password, role: 'parent' }),
+    onSuccess: () => window.location.reload(),
+    onError: (e: Error) => alert(e.message),
+  });
+
+  const joinMutation = useMutation({
+    mutationFn: async () =>
+      apiRequest('POST', '/api/auth/join-family', {
+        username,
+        password,
+        role: joinRole,
+        familyId: familyCode,
+      }),
+    onSuccess: () => window.location.reload(),
+    onError: (e: Error) => alert(e.message),
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username.trim() || !password.trim()) {
+      alert('Por favor escribe tu usuario y contraseña.');
+      return;
+    }
+    if (mode === 'join' && !familyCode.trim()) {
+      alert('Por favor ingresa el código familiar.');
+      return;
+    }
     if (mode === 'login') loginMutation.mutate();
     else if (mode === 'register') registerMutation.mutate();
     else joinMutation.mutate();
@@ -75,7 +74,6 @@ export default function AuthPage({ onSuccess }: AuthPageProps) {
             type="button"
             onClick={() => setMode('login')}
             className={`flex-1 py-2.5 text-sm font-bold font-display transition-colors ${mode === 'login' ? 'bg-primary text-primary-foreground' : 'bg-white text-muted-foreground hover:bg-muted/50'}`}
-            data-testid="button-mode-login"
           >
             Entrar
           </button>
@@ -83,7 +81,6 @@ export default function AuthPage({ onSuccess }: AuthPageProps) {
             type="button"
             onClick={() => setMode('register')}
             className={`flex-1 py-2.5 text-sm font-bold font-display transition-colors ${mode === 'register' ? 'bg-primary text-primary-foreground' : 'bg-white text-muted-foreground hover:bg-muted/50'}`}
-            data-testid="button-mode-register"
           >
             Nueva Familia
           </button>
@@ -91,7 +88,6 @@ export default function AuthPage({ onSuccess }: AuthPageProps) {
             type="button"
             onClick={() => setMode('join')}
             className={`flex-1 py-2.5 text-sm font-bold font-display transition-colors ${mode === 'join' ? 'bg-primary text-primary-foreground' : 'bg-white text-muted-foreground hover:bg-muted/50'}`}
-            data-testid="button-mode-join"
           >
             Unirse
           </button>
@@ -107,7 +103,6 @@ export default function AuthPage({ onSuccess }: AuthPageProps) {
               onChange={e => setUsername(e.target.value)}
               placeholder="Escribe tu nombre de usuario"
               required
-              data-testid="input-username"
             />
           </div>
 
@@ -121,66 +116,71 @@ export default function AuthPage({ onSuccess }: AuthPageProps) {
               onChange={e => setPassword(e.target.value)}
               placeholder="Escribe tu contraseña"
               required
-              data-testid="input-password"
             />
           </div>
 
-          {/* Rol - solo para registro/unirse */}
-          {(mode === 'register' || mode === 'join') && (
-            <div className="space-y-2">
-              <Label className="font-semibold">Soy...</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRole('parent')}
-                  className={`p-3 rounded-xl border-2 font-bold font-display transition-all ${role === 'parent' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/30 text-muted-foreground'}`}
-                  data-testid="button-role-parent"
-                >
-                  Padre/Madre
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole('child')}
-                  className={`p-3 rounded-xl border-2 font-bold font-display transition-all ${role === 'child' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/30 text-muted-foreground'}`}
-                  data-testid="button-role-child"
-                >
-                  Hijo/a
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Código familiar - solo para unirse */}
-          {mode === 'join' && (
-            <div className="space-y-2">
-              <Label htmlFor="familyCode" className="font-semibold">Código Familiar</Label>
-              <Input
-                id="familyCode"
-                value={familyCode}
-                onChange={e => setFamilyCode(e.target.value)}
-                placeholder="Ingresa el código de tu familia"
-                required
-                data-testid="input-family-code"
-              />
-              <p className="text-xs text-muted-foreground">
-                Pide a tu padre/madre el código familiar de su sección de Perfil.
+          {/* Nueva Familia: solo padres, explicación clara */}
+          {mode === 'register' && (
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 space-y-1">
+              <p className="text-sm font-bold text-purple-800">👨‍👩‍👧 Creando nueva familia</p>
+              <p className="text-xs text-purple-700">
+                Tu cuenta será de <strong>Padre/Madre</strong>. Una vez creada, comparte el 
+                <strong> código familiar</strong> con tus hijos para que se unan desde "Unirse".
               </p>
             </div>
           )}
 
-          {mode === 'register' && role === 'child' && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800">
-              Consejo: Los padres deben registrarse primero para crear la familia. Luego los hijos pueden unirse con el código familiar.
-            </div>
+          {/* Unirse: código familiar + selector de rol */}
+          {mode === 'join' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="familyCode" className="font-semibold">Código Familiar</Label>
+                <Input
+                  id="familyCode"
+                  value={familyCode}
+                  onChange={e => setFamilyCode(e.target.value)}
+                  placeholder="Pide el código a tu padre/madre"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  El código está en la sección Perfil de la cuenta del padre/madre.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="font-semibold">Soy...</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setJoinRole('parent')}
+                    className={`p-3 rounded-xl border-2 font-bold font-display transition-all ${joinRole === 'parent' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/30 text-muted-foreground'}`}
+                  >
+                    Padre/Madre
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setJoinRole('child')}
+                    className={`p-3 rounded-xl border-2 font-bold font-display transition-all ${joinRole === 'child' ? 'border-primary bg-primary/10 text-primary' : 'border-muted-foreground/30 text-muted-foreground'}`}
+                  >
+                    Hijo/a
+                  </button>
+                </div>
+              </div>
+            </>
           )}
 
           <Button
             type="submit"
             disabled={isPending}
             className="w-full min-h-12 text-base font-bold font-display"
-            data-testid="button-submit-auth"
           >
-            {isPending ? 'Cargando...' : mode === 'login' ? 'Iniciar Sesión' : mode === 'register' ? 'Crear Familia' : 'Unirse a Familia'}
+            {isPending
+              ? 'Cargando...'
+              : mode === 'login'
+              ? 'Iniciar Sesión'
+              : mode === 'register'
+              ? 'Crear Familia'
+              : 'Unirse a Familia'}
           </Button>
         </form>
       </div>
