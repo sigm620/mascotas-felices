@@ -16,8 +16,6 @@ export default function Auth() {
   // En "Nueva Familia" siempre es padre. En "Unirse" se elige.
   const [joinRole, setJoinRole] = useState<'parent' | 'child'>('child');
 
-  const isPending = loginMutation.isPending || registerMutation.isPending || joinMutation.isPending;
-
   const loginMutation = useMutation({
     mutationFn: async () => apiRequest('POST', '/api/auth/login', { username, password }),
     onSuccess: () => window.location.reload(),
@@ -42,6 +40,9 @@ export default function Auth() {
     onSuccess: () => window.location.reload(),
     onError: (e: Error) => alert(e.message),
   });
+
+  // Debe ir DESPUÉS de declarar las mutaciones (antes causaba el error TDZ).
+  const isPending = loginMutation.isPending || registerMutation.isPending || joinMutation.isPending;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
