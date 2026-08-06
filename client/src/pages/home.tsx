@@ -11,7 +11,9 @@ import { Shop } from '@/components/shop';
 import { MissionList } from '@/components/mission-list';
 import { ParentView } from '@/components/parent-view';
 import { MemoryGame } from '@/components/memory-game';
-import { CatchGame } from '@/components/catch-game';
+import { LetraGame } from '@/components/letra-game';
+import { NumerosGame } from '@/components/numeros-game';
+import { ColoresGame } from '@/components/colores-game';
 import { Achievements } from '@/components/achievements';
 import { PetSelection } from '@/components/pet-selection';
 import { useToast } from '@/hooks/use-toast';
@@ -56,7 +58,7 @@ export default function Home({ authUser, onLogout }: HomeProps) {
   const [view, setView] = useState<'child' | 'parent'>(() =>
     authUser.role === 'parent' ? 'parent' : 'child'
   );
-  const [gameView, setGameView] = useState<'memory' | 'catch' | null>(null);
+  const [gameView, setGameView] = useState<'memory' | 'letras' | 'numeros' | 'colores' | null>(null);
   const [copiedFamilyCode, setCopiedFamilyCode] = useState(false);
   const [showParentPasswordDialog, setShowParentPasswordDialog] = useState(false);
   const [parentPassword, setParentPassword] = useState('');
@@ -247,13 +249,13 @@ export default function Home({ authUser, onLogout }: HomeProps) {
     );
   };
 
-  const onCatchGameComplete = (score: number) => {
+  const onEducationalGameComplete = (score: number, gameType: string) => {
     submitScoreMutation.mutate(
-      { score, gameType: 'catch' },
+      { score, gameType },
       {
         onSuccess: () => {
           setGameView(null);
-          toast({ title: '¡Fin del juego!', description: `Puntuación: ${score} (+1 moneda)` });
+          toast({ title: '¡Bien hecho!', description: `Aciertos: ${score} de 8 🌟` });
         },
       }
     );
@@ -275,8 +277,6 @@ export default function Home({ authUser, onLogout }: HomeProps) {
         </div>
       </div>
     );
-  }
-
   if (error || !data) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center p-4">
@@ -290,8 +290,6 @@ export default function Home({ authUser, onLogout }: HomeProps) {
         </div>
       </div>
     );
-  }
-
   if (data.pet && !data.pet.configured) {
     return (
       <PetSelection
@@ -299,16 +297,14 @@ export default function Home({ authUser, onLogout }: HomeProps) {
         isLoading={configurePetMutation.isPending}
       />
     );
-  }
-
   if (gameView === 'memory') {
     return <MemoryGame onComplete={onMemoryGameComplete} onExit={() => setGameView(null)} />;
-  }
-
-  if (gameView === 'catch') {
-    return <CatchGame onComplete={onCatchGameComplete} onExit={() => setGameView(null)} />;
-  }
-
+  if (gameView === "letras") {
+    return <LetraGame onComplete={(s) => onEducationalGameComplete(s, "letras")} onExit={() => setGameView(null)} />;
+  if (gameView === "numeros") {
+    return <NumerosGame onComplete={(s) => onEducationalGameComplete(s, "numeros")} onExit={() => setGameView(null)} />;
+  if (gameView === "colores") {
+    return <ColoresGame onComplete={(s) => onEducationalGameComplete(s, "colores")} onExit={() => setGameView(null)} />;
   const bowlBonus = data.gameState.activeBowl === 'bowl_special' ? 20 : data.gameState.activeBowl === 'bowl_basic' ? 10 : 0;
 
   return (
@@ -437,7 +433,9 @@ export default function Home({ authUser, onLogout }: HomeProps) {
 
             <MiniGames
               onStartMemory={() => setGameView('memory')}
-              onStartCatch={() => setGameView('catch')}
+              onStartLetras={() => setGameView('letras')}
+              onStartNumeros={() => setGameView('numeros')}
+              onStartColores={() => setGameView('colores')}
             />
 
             <Shop
