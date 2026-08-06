@@ -299,12 +299,19 @@ export default function Home({ authUser, onLogout }: HomeProps) {
     );
   if (gameView === 'memory') {
     return <MemoryGame onComplete={onMemoryGameComplete} onExit={() => setGameView(null)} />;
-  if (gameView === "letras") {
-    return <LetraGame onComplete={(s) => onEducationalGameComplete(s, "letras")} onExit={() => setGameView(null)} />;
-  if (gameView === "numeros") {
-    return <NumerosGame onComplete={(s) => onEducationalGameComplete(s, "numeros")} onExit={() => setGameView(null)} />;
-  if (gameView === "colores") {
-    return <ColoresGame onComplete={(s) => onEducationalGameComplete(s, "colores")} onExit={() => setGameView(null)} />;
+  }
+
+  if (gameView === 'letras') {
+    return <LetraGame onComplete={(s) => onEducationalGameComplete(s, 'letras')} onExit={() => setGameView(null)} />;
+  }
+
+  if (gameView === 'numeros') {
+    return <NumerosGame onComplete={(s) => onEducationalGameComplete(s, 'numeros')} onExit={() => setGameView(null)} />;
+  }
+
+  if (gameView === 'colores') {
+    return <ColoresGame onComplete={(s) => onEducationalGameComplete(s, 'colores')} onExit={() => setGameView(null)} />;
+  }
   const bowlBonus = data.gameState.activeBowl === 'bowl_special' ? 20 : data.gameState.activeBowl === 'bowl_basic' ? 10 : 0;
 
   return (
