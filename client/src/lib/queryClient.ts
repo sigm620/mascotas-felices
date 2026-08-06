@@ -37,7 +37,7 @@ export const getQueryFn: <T>(options: {
       const cached = getCachedGameState();
       if (cached) {
         console.log("[queryClient] Offline — usando estado cacheado del juego");
-        return cached as T;
+        return cached as never;
       }
     }
 
@@ -45,7 +45,7 @@ export const getQueryFn: <T>(options: {
       const res = await fetch(url, { credentials: "include" });
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        return null;
+        return null as never;
       }
 
       await throwIfResNotOk(res);
@@ -63,7 +63,7 @@ export const getQueryFn: <T>(options: {
         const cached = getCachedGameState();
         if (cached) {
           console.log("[queryClient] Error de red — usando estado cacheado");
-          return cached as T;
+          return cached as never;
         }
       }
       throw err;

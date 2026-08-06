@@ -37,7 +37,7 @@ function generarOpciones(correcta: number, min: number, max: number): number[] {
     const r = Math.floor(Math.random() * (max - min + 1)) + min;
     if (r !== correcta) ops.add(r);
   }
-  return [...ops].sort(() => Math.random() - 0.5);
+  return Array.from(ops).sort(() => Math.random() - 0.5);
 }
 
 export function NumerosGame({ onComplete, onExit }: NumerosGameProps) {

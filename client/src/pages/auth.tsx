@@ -7,7 +7,11 @@ import { Label } from '@/components/ui/label';
 
 type Mode = 'login' | 'register' | 'join';
 
-export default function Auth() {
+interface AuthProps {
+  onSuccess?: () => void;
+}
+
+export default function Auth({ onSuccess }: AuthProps) {
   const [mode, setMode] = useState<Mode>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,14 +22,14 @@ export default function Auth() {
 
   const loginMutation = useMutation({
     mutationFn: async () => apiRequest('POST', '/api/auth/login', { username, password }),
-    onSuccess: () => window.location.reload(),
+    onSuccess: () => { if (onSuccess) onSuccess(); else window.location.reload(); },
     onError: (e: Error) => alert(e.message),
   });
 
   const registerMutation = useMutation({
     mutationFn: async () =>
       apiRequest('POST', '/api/auth/register', { username, password, role: 'parent' }),
-    onSuccess: () => window.location.reload(),
+    onSuccess: () => { if (onSuccess) onSuccess(); else window.location.reload(); },
     onError: (e: Error) => alert(e.message),
   });
 
@@ -37,11 +41,10 @@ export default function Auth() {
         role: joinRole,
         familyId: familyCode,
       }),
-    onSuccess: () => window.location.reload(),
+    onSuccess: () => { if (onSuccess) onSuccess(); else window.location.reload(); },
     onError: (e: Error) => alert(e.message),
   });
 
-  // Debe ir DESPUÉS de declarar las mutaciones (antes causaba el error TDZ).
   const isPending = loginMutation.isPending || registerMutation.isPending || joinMutation.isPending;
 
   const handleSubmit = (e: React.FormEvent) => {
