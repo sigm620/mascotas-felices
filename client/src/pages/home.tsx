@@ -277,6 +277,8 @@ export default function Home({ authUser, onLogout }: HomeProps) {
         </div>
       </div>
     );
+  }
+
   if (error || !data) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-blue-400 flex items-center justify-center p-4">
@@ -290,6 +292,8 @@ export default function Home({ authUser, onLogout }: HomeProps) {
         </div>
       </div>
     );
+  }
+
   if (data.pet && !data.pet.configured) {
     return (
       <PetSelection
@@ -297,6 +301,8 @@ export default function Home({ authUser, onLogout }: HomeProps) {
         isLoading={configurePetMutation.isPending}
       />
     );
+  }
+
   if (gameView === 'memory') {
     return <MemoryGame onComplete={onMemoryGameComplete} onExit={() => setGameView(null)} />;
   }
@@ -312,6 +318,7 @@ export default function Home({ authUser, onLogout }: HomeProps) {
   if (gameView === 'colores') {
     return <ColoresGame onComplete={(s) => onEducationalGameComplete(s, 'colores')} onExit={() => setGameView(null)} />;
   }
+
   const bowlBonus = data.gameState.activeBowl === 'bowl_special' ? 20 : data.gameState.activeBowl === 'bowl_basic' ? 10 : 0;
 
   return (
