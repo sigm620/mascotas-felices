@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { X as CloseIcon, Volume2 } from 'lucide-react';
+import { hablar, esperar } from '@/lib/speech';
 
 interface ColoresGameProps {
   onComplete: (score: number) => void;
@@ -10,11 +11,7 @@ interface ColoresGameProps {
 
 type Forma = 'circle' | 'square' | 'triangle' | 'star' | 'heart' | 'diamond';
 
-interface ColorOpcion {
-  color: string;
-  nombre: string;
-  hex: string;
-}
+interface ColorOpcion { color: string; nombre: string; hex: string; }
 
 const COLORES: ColorOpcion[] = [
   { color: 'rojo',     nombre: 'Rojo',     hex: '#ef4444' },
@@ -31,35 +28,27 @@ const COLORES: ColorOpcion[] = [
 
 const FORMAS: Forma[] = ['circle', 'square', 'triangle', 'star', 'heart', 'diamond'];
 
-function hablar(texto: string) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(texto);
-  utt.lang = 'es-ES';
-  utt.rate = 0.85;
-  utt.pitch = 1.1;
-  window.speechSynthesis.speak(utt);
-}
+const NOMBRES_FORMAS: Record<Forma, string> = {
+  circle: 'círculo', square: 'cuadrado', triangle: 'triángulo',
+  star: 'estrella', heart: 'corazón', diamond: 'rombo',
+};
 
 function FormaIcon({ forma, color, size = 80 }: { forma: Forma; color: string; size?: number }) {
   if (forma === 'circle') return <div style={{ width: size, height: size, borderRadius: '50%', backgroundColor: color }} />;
   if (forma === 'square') return <div style={{ width: size, height: size, borderRadius: 12, backgroundColor: color }} />;
-  if (forma === 'triangle') return (
-    <div style={{ width: 0, height: 0, borderLeft: `${size/2}px solid transparent`, borderRight: `${size/2}px solid transparent`, borderBottom: `${size}px solid ${color}` }} />
-  );
+  if (forma === 'triangle') return <div style={{ width: 0, height: 0, borderLeft: `${size/2}px solid transparent`, borderRight: `${size/2}px solid transparent`, borderBottom: `${size}px solid ${color}` }} />;
   if (forma === 'heart') return <div style={{ fontSize: size * 0.9, lineHeight: 1, color }}>♥</div>;
   if (forma === 'diamond') return <div style={{ fontSize: size * 0.85, lineHeight: 1, color }}>◆</div>;
   return <div style={{ fontSize: size, lineHeight: 1, color }}>★</div>;
 }
 
-const TOTAL_PREGUNTAS = 8;
+const TOTAL = 8;
 const TIEMPO = 12;
 type TipoPregunta = 'color' | 'forma';
 
 function generarPregunta(tipo: TipoPregunta) {
   const color = COLORES[Math.floor(Math.random() * COLORES.length)];
   const forma = FORMAS[Math.floor(Math.random() * FORMAS.length)];
-
   if (tipo === 'color') {
     const otros = COLORES.filter(c => c.color !== color.color).sort(() => Math.random() - 0.5).slice(0, 3);
     return { tipo, forma, color, opciones: [color, ...otros].sort(() => Math.random() - 0.5) };
@@ -69,73 +58,62 @@ function generarPregunta(tipo: TipoPregunta) {
   }
 }
 
-const NOMBRES_FORMAS: Record<Forma, string> = {
-  circle: 'círculo', square: 'cuadrado', triangle: 'triángulo',
-  star: 'estrella', heart: 'corazón', diamond: 'rombo',
-};
-
 export function ColoresGame({ onComplete, onExit }: ColoresGameProps) {
   const [preguntas] = useState(() =>
-    Array.from({ length: TOTAL_PREGUNTAS }, (_, i) => generarPregunta(i % 2 === 0 ? 'color' : 'forma'))
+    Array.from({ length: TOTAL }, (_, i) => generarPregunta(i % 2 === 0 ? 'color' : 'forma'))
   );
   const [indice, setIndice] = useState(0);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TIEMPO);
   const [seleccion, setSeleccion] = useState<string | null>(null);
+  const [bloqueado, setBloqueado] = useState(false);
 
   const p = preguntas[indice];
 
   const leerPregunta = useCallback((tipo: string, nombreForma: string) => {
-    const texto = tipo === 'color'
-      ? `¿De qué color es el ${nombreForma}?`
-      : `¿Cuál tiene la misma forma?`;
-    setTimeout(() => hablar(texto), 300);
+    hablar(tipo === 'color' ? `¿De qué color es el ${nombreForma}?` : '¿Cuál tiene la misma forma?');
   }, []);
 
   useEffect(() => {
-    leerPregunta(p.tipo, NOMBRES_FORMAS[p.forma]);
-    return () => { window.speechSynthesis?.cancel(); };
-  }, [indice, p.tipo, p.forma, leerPregunta]);
+    setBloqueado(false);
+    setSeleccion(null);
+    setTimeLeft(TIEMPO);
+    const pp = preguntas[indice];
+    setTimeout(() => leerPregunta(pp.tipo, NOMBRES_FORMAS[pp.forma]), 400);
+  }, [indice]);
 
   useEffect(() => {
-    if (seleccion !== null) return;
-    if (timeLeft <= 0) { avanzar(false); return; }
+    if (bloqueado || seleccion !== null) return;
+    if (timeLeft <= 0) { elegirColor({ color: '__timeout__', nombre: '', hex: '' }); return; }
     const t = setTimeout(() => setTimeLeft(t => t - 1), 1000);
     return () => clearTimeout(t);
-  }, [timeLeft, seleccion]);
+  }, [timeLeft, seleccion, bloqueado]);
 
-  function avanzar(correcto: boolean) {
-    const nuevoScore = correcto ? score + 1 : score;
-    if (correcto) setScore(nuevoScore);
-    setTimeout(() => {
-      if (indice + 1 >= TOTAL_PREGUNTAS) {
-        window.speechSynthesis?.cancel();
-        onComplete(nuevoScore);
-      } else {
-        setIndice(i => i + 1);
-        setSeleccion(null);
-        setTimeLeft(TIEMPO);
-      }
-    }, 900);
-  }
-
-  function elegirColor(op: ColorOpcion) {
-    if (seleccion !== null) return;
+  async function elegirColor(op: ColorOpcion) {
+    if (bloqueado || seleccion !== null) return;
+    setBloqueado(true);
     setSeleccion(op.color);
     const correcto = op.color === p.color.color;
-    hablar(correcto ? '¡Muy bien!' : `Es el color ${p.color.nombre}`);
-    avanzar(correcto);
+    if (correcto) setScore(s => s + 1);
+    await hablar(correcto ? '¡Muy bien!' : `Es el color ${p.color.nombre}`);
+    await esperar(300);
+    if (indice + 1 >= TOTAL) { window.speechSynthesis?.cancel(); onComplete(correcto ? score + 1 : score); }
+    else setIndice(i => i + 1);
   }
 
-  function elegirForma(forma: Forma) {
-    if (seleccion !== null) return;
+  async function elegirForma(forma: Forma) {
+    if (bloqueado || seleccion !== null) return;
+    setBloqueado(true);
     setSeleccion(forma);
     const correcto = forma === p.forma;
-    hablar(correcto ? '¡Correcto!' : `Es un ${NOMBRES_FORMAS[p.forma]}`);
-    avanzar(correcto);
+    if (correcto) setScore(s => s + 1);
+    await hablar(correcto ? '¡Correcto!' : `Es un ${NOMBRES_FORMAS[p.forma]}`);
+    await esperar(300);
+    if (indice + 1 >= TOTAL) { window.speechSynthesis?.cancel(); onComplete(correcto ? score + 1 : score); }
+    else setIndice(i => i + 1);
   }
 
-  const bordeColor = (esCorrecta: boolean, esSeleccionada: boolean) => {
+  const borde = (esCorrecta: boolean, esSeleccionada: boolean) => {
     if (seleccion === null) return '3px solid transparent';
     if (esCorrecta) return '3px solid #22c55e';
     if (esSeleccionada) return '3px solid #ef4444';
@@ -150,7 +128,7 @@ export function ColoresGame({ onComplete, onExit }: ColoresGameProps) {
     <div className="min-h-screen bg-gradient-to-br from-pink-300 via-purple-200 to-indigo-300 p-4 flex items-center justify-center">
       <Card className="w-full max-w-sm p-6 shadow-2xl">
         <div className="flex justify-between items-center mb-4">
-          <span className="text-lg font-bold font-display text-purple-700">{indice + 1} / {TOTAL_PREGUNTAS}</span>
+          <span className="text-lg font-bold font-display text-purple-700">{indice + 1} / {TOTAL}</span>
           <span className={`text-lg font-bold font-display ${timeLeft <= 5 ? 'text-red-500 animate-pulse' : 'text-gray-600'}`}>
             ⏱ {timeLeft}s
           </span>
@@ -163,12 +141,9 @@ export function ColoresGame({ onComplete, onExit }: ColoresGameProps) {
 
         <div className="bg-gray-50 rounded-2xl p-6 mb-4 flex flex-col items-center justify-center min-h-36">
           <FormaIcon forma={p.forma} color={p.color.hex} size={90} />
-          <button
-            onClick={() => leerPregunta(p.tipo, NOMBRES_FORMAS[p.forma])}
-            className="flex items-center gap-1 mx-auto text-sm font-bold text-purple-600 hover:text-purple-800 mt-3"
-          >
-            <Volume2 size={14} />
-            {preguntaTexto}
+          <button onClick={() => leerPregunta(p.tipo, NOMBRES_FORMAS[p.forma])}
+            className="flex items-center gap-1 mx-auto text-sm font-bold text-purple-600 hover:text-purple-800 mt-3">
+            <Volume2 size={14} /> {preguntaTexto}
           </button>
         </div>
 
@@ -180,12 +155,7 @@ export function ColoresGame({ onComplete, onExit }: ColoresGameProps) {
               return (
                 <button key={op.color} onClick={() => elegirColor(op)}
                   className="py-6 rounded-2xl transition-all active:scale-95"
-                  style={{
-                    backgroundColor: op.hex,
-                    border: bordeColor(esCorrecta, esSeleccionada),
-                    opacity: seleccion !== null && !esCorrecta && !esSeleccionada ? 0.4 : 1,
-                  }}
-                />
+                  style={{ backgroundColor: op.hex, border: borde(esCorrecta, esSeleccionada), opacity: seleccion !== null && !esCorrecta && !esSeleccionada ? 0.4 : 1 }} />
               );
             })}
           </div>
@@ -199,11 +169,7 @@ export function ColoresGame({ onComplete, onExit }: ColoresGameProps) {
               return (
                 <button key={forma} onClick={() => elegirForma(forma)}
                   className="py-3 rounded-2xl bg-white flex items-center justify-center transition-all active:scale-95"
-                  style={{
-                    border: bordeColor(esCorrecta, esSeleccionada),
-                    opacity: seleccion !== null && !esCorrecta && !esSeleccionada ? 0.4 : 1,
-                    minHeight: 80,
-                  }}>
+                  style={{ border: borde(esCorrecta, esSeleccionada), opacity: seleccion !== null && !esCorrecta && !esSeleccionada ? 0.4 : 1, minHeight: 80 }}>
                   <FormaIcon forma={forma} color={p.color.hex} size={45} />
                 </button>
               );
