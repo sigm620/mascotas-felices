@@ -1222,41 +1222,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/research/export", requireParent, async (req, res) => {
     try {
       const familyId = req.session.familyId!;
-      const [missionLogsList, appUsageList] = await Promise.all([
+
+      // Obtener usuarios de la familia directamente
+      const { db: dbConn } = await import('./db.js');
+      const { users: usersTable } = await import('../shared/schema.js');
+      const { eq: eqOp } = await import('drizzle-orm');
+      const familyUsers = await dbConn.select().from(usersTable).where(eqOp(usersTable.familyId, familyId));
+      const parentUser = familyUsers.find((u: any) => u.role === 'parent');
+      const childUsers = familyUsers.filter((u: any) => u.role === 'child');
+      const userMap = new Map(familyUsers.map((u: any) => [u.id, u.username]));
+
+      const [missionLogsList, appUsageList, gameState, weeklyMissions] = await Promise.all([
         storage.getMissionLogs(familyId),
         storage.getAppUsage(familyId),
+        storage.getGameState(familyId),
+        storage.getMissionsByWeek(familyId, getWeekId(new Date())),
       ]);
 
-      let csv = "Tipo,Dato\n";
-      csv += "\nMISIONES COMPLETADAS\n";
-      csv += "Título,Tipo,Recompensa,Semana,Fecha Completada\n";
+      const now = new Date().toLocaleString('es-CO');
+      const padreNombre = parentUser?.username || 'Sin nombre';
+      const hijosNombres = childUsers.map((u: any) => u.username).join(' - ') || 'Sin hijos';
+
+      let csv = 'REPORTE DE USO - MASCOTAS FELICES\n';
+      csv += `Exportado el,"${now}"\n`;
+      csv += `Padre/Madre,"${padreNombre}"\n`;
+      csv += `Hijos,"${hijosNombres}"\n\n`;
+
+      csv += 'MISIONES COMPLETADAS\n';
+      csv += 'Titulo,Tipo,Recompensa (pts),Semana,Fecha\n';
       for (const log of missionLogsList) {
-        const dateStr = log.completedAt ? new Date(log.completedAt).toLocaleString('es-MX') : '';
-        csv += `"${log.missionTitle}","${log.missionType}",${log.reward},"${log.weekId}","${dateStr}"\n`;
+        const dateStr = log.completedAt ? new Date(log.completedAt).toLocaleString('es-CO') : '';
+        const tipo = log.missionType === 'parent' ? 'Padre' : log.missionType === 'system' ? 'Sistema' : 'Minijuego';
+        csv += `"${log.missionTitle}","${tipo}",${log.reward},"${log.weekId}","${dateStr}"
+`;
       }
 
-      csv += "\nUSO DE LA APP\n";
-      csv += "Usuario,Fecha\n";
+      csv += '\nUSO DE LA APP\n';
+      csv += 'Usuario,Fecha\n';
       for (const usage of appUsageList) {
-        csv += `"${usage.userId}","${usage.date}"\n`;
+        const nombre = (userMap as Map<string,string>).get(usage.userId) || usage.userId;
+        csv += `"${nombre}","${usage.date}"
+`;
       }
 
-      const weeklyMissions = await storage.getMissionsByWeek(familyId, getWeekId(new Date()));
-      const parentCount = weeklyMissions.filter(m => m.type === 'parent').length;
-      const completedCount = weeklyMissions.filter(m => m.completed || m.approved).length;
+      const parentCount = weeklyMissions.filter((m: any) => m.type === 'parent').length;
+      const completedCount = weeklyMissions.filter((m: any) => m.completed || m.approved).length;
 
-      csv += "\nRESUMEN SEMANAL\n";
-      csv += `Misiones de padres creadas,${parentCount}\n`;
-      csv += `Misiones completadas esta semana,${completedCount}\n`;
-      csv += `Total misiones esta semana,${weeklyMissions.length}\n`;
+      csv += '\nRESUMEN ESTA SEMANA\n';
+      csv += `Misiones creadas por padres,${parentCount}
+`;
+      csv += `Misiones completadas,${completedCount}
+`;
+      csv += `Total misiones,${weeklyMissions.length}
+`;
 
-      const gameState = await storage.getGameState(familyId);
       if (gameState) {
-        csv += `Días consecutivos,${gameState.consecutiveDays}\n`;
+        csv += `Dias consecutivos de uso,${gameState.consecutiveDays}
+`;
+        csv += `Puntos totales acumulados,${gameState.points}
+`;
+        if (gameState.weeklyGameData) {
+          try {
+            const wd = JSON.parse(gameState.weeklyGameData as string) as any;
+            csv += '\nJUEGOS ESTA SEMANA\n';
+            csv += 'Juego,Veces jugado,Mejor puntaje\n';
+            csv += `Memoria,${wd.memoryPlays||0},${wd.memoryBestScore||0}
+`;
+            csv += `Letras,${wd.letrasPlays||0},${wd.letrasBestScore||0}/8 aciertos
+`;
+            csv += `Numeros,${wd.numerosPlays||0},${wd.numerosBestScore||0}/8 aciertos
+`;
+            csv += `Colores,${wd.coloresPlays||0},${wd.coloresBestScore||0}/8 aciertos
+`;
+          } catch {}
+        }
       }
 
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader('Content-Disposition', 'attachment; filename=datos_investigacion.csv');
+      res.setHeader('Content-Disposition', `attachment; filename=mascotas_felices_${padreNombre}.csv`);
       res.send(csv);
     } catch (error) {
       res.status(500).json({ error: "Error al exportar datos" });
