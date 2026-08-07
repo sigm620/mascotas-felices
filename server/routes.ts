@@ -9,6 +9,10 @@ import { randomUUID } from "crypto";
 import { getCosmeticById, COSMETIC_CATALOG } from "@shared/cosmetics";
 
 const ACHIEVEMENT_TYPES = {
+  LETRAS_STAR: { type: 'letras_star', title: '¡Sé las letras!', description: 'Acierta 6 o más en el juego de Letras', icon: '🔤' },
+  NUMEROS_STAR: { type: 'numeros_star', title: '¡Sé los números!', description: 'Acierta 6 o más en el juego de Números', icon: '🔢' },
+  COLORES_STAR: { type: 'colores_star', title: '¡Sé los colores!', description: 'Acierta 6 o más en el juego de Colores', icon: '🎨' },
+  EDUCADOR: { type: 'educador', title: 'Mini Educador', description: 'Juega los 3 juegos educativos al menos 1 vez', icon: '🎓' },
   FIRST_MISSION: { type: 'first_mission', title: 'First Steps', description: 'Complete your first mission!', icon: '🌟' },
   FIVE_MISSIONS: { type: 'five_missions', title: 'Mission Master', description: 'Complete 5 missions', icon: '🏆' },
   TEN_MISSIONS: { type: 'ten_missions', title: 'Champion', description: 'Complete 10 missions', icon: '👑' },
@@ -63,16 +67,19 @@ function getWeeklyGameData(gameState: { weeklyGameData: string | null }, current
       if (data.weekId === currentWeekId) return data;
     } catch {}
   }
-  return { weekId: currentWeekId, memoryPlays: 0, catchPlays: 0, memoryBestScore: 0, catchBestScore: 0 };
+  return { weekId: currentWeekId, memoryPlays: 0, catchPlays: 0, memoryBestScore: 0, catchBestScore: 0, letrasPlays: 0, letrasBestScore: 0, numerosPlays: 0, numerosBestScore: 0, coloresPlays: 0, coloresBestScore: 0 };
 }
 
 const MINIGAME_MISSION_POOL = [
   { title: 'Juega Memoria 2 veces', description: 'Completa el juego de memoria 2 veces esta semana', autoDetect: 'play_memory_2', progressTarget: 2, reward: 25, statBonus: 'happiness', statAmount: 5 },
-  { title: 'Juega Atrapar Estrellas 2 veces', description: 'Juega el juego de atrapar 2 veces esta semana', autoDetect: 'play_catch_2', progressTarget: 2, reward: 25, statBonus: 'happiness', statAmount: 5 },
-  { title: 'Atrapa 15 estrellas', description: 'Consigue al menos 15 estrellas en Atrapar Estrellas', autoDetect: 'catch_score_15', progressTarget: 1, reward: 30, statBonus: 'happiness', statAmount: 10 },
   { title: 'Juega Memoria 3 veces', description: 'Completa el juego de memoria 3 veces esta semana', autoDetect: 'play_memory_3', progressTarget: 3, reward: 30, statBonus: 'happiness', statAmount: 8 },
-  { title: 'Atrapa 20 estrellas', description: 'Consigue al menos 20 estrellas en Atrapar Estrellas', autoDetect: 'catch_score_20', progressTarget: 1, reward: 35, statBonus: 'happiness', statAmount: 10 },
-  { title: 'Juega ambos minijuegos', description: 'Juega Memoria y Atrapar Estrellas al menos 1 vez', autoDetect: 'play_both_games', progressTarget: 2, reward: 30, statBonus: 'happiness', statAmount: 8 },
+  { title: 'Aprende las letras 2 veces', description: 'Juega el juego de Letras 2 veces esta semana', autoDetect: 'play_letras_2', progressTarget: 2, reward: 25, statBonus: 'happiness', statAmount: 5 },
+  { title: '¡Experto en letras!', description: 'Consigue 7 o más aciertos en el juego de Letras', autoDetect: 'letras_score_7', progressTarget: 1, reward: 35, statBonus: 'happiness', statAmount: 10 },
+  { title: 'Practica los números 2 veces', description: 'Juega el juego de Números 2 veces esta semana', autoDetect: 'play_numeros_2', progressTarget: 2, reward: 25, statBonus: 'happiness', statAmount: 5 },
+  { title: '¡Genio de los números!', description: 'Consigue 7 o más aciertos en el juego de Números', autoDetect: 'numeros_score_7', progressTarget: 1, reward: 35, statBonus: 'happiness', statAmount: 10 },
+  { title: 'Aprende los colores 2 veces', description: 'Juega el juego de Colores 2 veces esta semana', autoDetect: 'play_colores_2', progressTarget: 2, reward: 25, statBonus: 'happiness', statAmount: 5 },
+  { title: '¡Artista de colores!', description: 'Consigue 7 o más aciertos en el juego de Colores', autoDetect: 'colores_score_7', progressTarget: 1, reward: 35, statBonus: 'happiness', statAmount: 10 },
+  { title: 'Juega todos los juegos', description: 'Juega Memoria, Letras, Números y Colores al menos 1 vez', autoDetect: 'play_all_games', progressTarget: 4, reward: 50, statBonus: 'happiness', statAmount: 15 },
 ];
 
 function pickMinigameMissions(weekId: string): typeof MINIGAME_MISSION_POOL[number][] {
@@ -151,12 +158,13 @@ async function checkAndAutoCompleteMissions(familyId: string, weekId: string, ga
 
     switch (mission.autoDetect) {
       case 'play_minigame':
-        newProgress = Math.min(mission.progressTarget, gameData.memoryPlays + gameData.catchPlays > 0 ? 1 : 0);
+        const anyPlayed = (gameData.memoryPlays + (gameData.letrasPlays||0) + (gameData.numerosPlays||0) + (gameData.coloresPlays||0)) > 0 ? 1 : 0;
+        newProgress = Math.min(mission.progressTarget, anyPlayed);
         shouldComplete = newProgress >= mission.progressTarget;
         break;
       case 'score_100':
       case 'score_20': {
-        const maxScore = Math.max(gameData.memoryBestScore, gameData.catchBestScore);
+        const maxScore = Math.max(gameData.memoryBestScore, gameData.letrasBestScore||0, gameData.numerosBestScore||0, gameData.coloresBestScore||0);
         const target = mission.autoDetect === 'score_20' ? 20 : 100;
         newProgress = maxScore >= target ? 1 : 0;
         shouldComplete = newProgress >= mission.progressTarget;
@@ -174,22 +182,38 @@ async function checkAndAutoCompleteMissions(familyId: string, weekId: string, ga
         newProgress = Math.min(mission.progressTarget, gameData.memoryPlays);
         shouldComplete = newProgress >= mission.progressTarget;
         break;
-      case 'play_catch_2':
-        newProgress = Math.min(mission.progressTarget, gameData.catchPlays);
+      case 'play_letras_2':
+        newProgress = Math.min(mission.progressTarget, gameData.letrasPlays||0);
         shouldComplete = newProgress >= mission.progressTarget;
         break;
-      case 'catch_score_15':
-        newProgress = gameData.catchBestScore >= 15 ? 1 : 0;
+      case 'letras_score_7':
+        newProgress = (gameData.letrasBestScore||0) >= 7 ? 1 : 0;
         shouldComplete = newProgress >= mission.progressTarget;
         break;
-      case 'catch_score_20':
-        newProgress = gameData.catchBestScore >= 20 ? 1 : 0;
+      case 'play_numeros_2':
+        newProgress = Math.min(mission.progressTarget, gameData.numerosPlays||0);
         shouldComplete = newProgress >= mission.progressTarget;
         break;
-      case 'play_both_games': {
-        const memPlayed = gameData.memoryPlays > 0 ? 1 : 0;
-        const catchPlayed = gameData.catchPlays > 0 ? 1 : 0;
-        newProgress = memPlayed + catchPlayed;
+      case 'numeros_score_7':
+        newProgress = (gameData.numerosBestScore||0) >= 7 ? 1 : 0;
+        shouldComplete = newProgress >= mission.progressTarget;
+        break;
+      case 'play_colores_2':
+        newProgress = Math.min(mission.progressTarget, gameData.coloresPlays||0);
+        shouldComplete = newProgress >= mission.progressTarget;
+        break;
+      case 'colores_score_7':
+        newProgress = (gameData.coloresBestScore||0) >= 7 ? 1 : 0;
+        shouldComplete = newProgress >= mission.progressTarget;
+        break;
+      case 'play_all_games': {
+        const played = [
+          gameData.memoryPlays > 0,
+          (gameData.letrasPlays||0) > 0,
+          (gameData.numerosPlays||0) > 0,
+          (gameData.coloresPlays||0) > 0,
+        ].filter(Boolean).length;
+        newProgress = played;
         shouldComplete = newProgress >= mission.progressTarget;
         break;
       }
@@ -222,11 +246,6 @@ async function checkAndAutoCompleteMissions(familyId: string, weekId: string, ga
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-
-  // Health check para Render.com
-  app.get("/api/health", (_req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
-  });
 
   // ========================
   // AUTH ROUTES
@@ -394,24 +413,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const familyId = req.session.familyId!;
       const userId = req.session.userId!;
-      let [pet, inventory, gameState, achievementList, cosmeticsList] = await Promise.all([
+      const [pet, inventory, gameState, achievementList, cosmeticsList] = await Promise.all([
         storage.getPet(familyId),
         storage.getInventory(familyId),
         storage.getGameState(familyId),
         storage.getAchievements(familyId),
         storage.getOwnedCosmetics(familyId),
       ]);
-
-      // Auto-inicializar datos si no existen (por ejemplo si el hijo se unió antes que el padre)
-      if (!pet) {
-        pet = await storage.createPet({ familyId, name: 'Pelusa', type: '🐶', hunger: 70, happiness: 60, health: 80, level: 1 });
-      }
-      if (!inventory) {
-        inventory = await storage.createInventory({ familyId, food: 0, toys: 0, medicine: 1, basicFood: 3, snack: 0, ball: 1, rope: 1 });
-      }
-      if (!gameState) {
-        gameState = await storage.createGameState({ familyId, points: 150 });
-      }
 
       if (gameState && pet) {
         const now = new Date();
@@ -497,6 +505,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           stateUpdates.weeklyGameData = JSON.stringify({
             weekId: currentWeekId, memoryPlays: 0, catchPlays: 0,
             memoryBestScore: 0, catchBestScore: 0,
+            letrasPlays: 0, letrasBestScore: 0, numerosPlays: 0, numerosBestScore: 0, coloresPlays: 0, coloresBestScore: 0,
           });
         }
 
@@ -1128,8 +1137,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (gameType === 'memory') {
         happinessIncrease = 15;
-      } else if (gameType === 'catch') {
-        happinessIncrease = 10;
+      } else if (gameType === 'letras' || gameType === 'numeros' || gameType === 'colores') {
+        happinessIncrease = 12;
+        pointsToAdd = Math.max(1, Math.floor(score / 2));
       }
 
       const currentWeekId = getWeekId(new Date());
@@ -1138,9 +1148,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (gameType === 'memory') {
         weeklyData.memoryPlays++;
         weeklyData.memoryBestScore = Math.max(weeklyData.memoryBestScore, score);
-      } else if (gameType === 'catch') {
-        weeklyData.catchPlays++;
-        weeklyData.catchBestScore = Math.max(weeklyData.catchBestScore, score);
+      } else if (gameType === 'letras') {
+        weeklyData.letrasPlays = (weeklyData.letrasPlays||0) + 1;
+        weeklyData.letrasBestScore = Math.max(weeklyData.letrasBestScore||0, score);
+      } else if (gameType === 'numeros') {
+        weeklyData.numerosPlays = (weeklyData.numerosPlays||0) + 1;
+        weeklyData.numerosBestScore = Math.max(weeklyData.numerosBestScore||0, score);
+      } else if (gameType === 'colores') {
+        weeklyData.coloresPlays = (weeklyData.coloresPlays||0) + 1;
+        weeklyData.coloresBestScore = Math.max(weeklyData.coloresBestScore||0, score);
       }
 
       const [updatedGameState, updatedPet] = await Promise.all([
@@ -1157,9 +1173,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const earned = await awardAchievementIfNew(familyId, 'memory_win');
         if (earned) newAchievements.push('memory_win');
       }
-      if (gameType === 'catch' && score >= 10) {
-        const earned = await awardAchievementIfNew(familyId, 'catch_star');
-        if (earned) newAchievements.push('catch_star');
+      if (gameType === 'letras' && score >= 6) {
+        const earned = await awardAchievementIfNew(familyId, 'letras_star');
+        if (earned) newAchievements.push('letras_star');
+      }
+      if (gameType === 'numeros' && score >= 6) {
+        const earned = await awardAchievementIfNew(familyId, 'numeros_star');
+        if (earned) newAchievements.push('numeros_star');
+      }
+      if (gameType === 'colores' && score >= 6) {
+        const earned = await awardAchievementIfNew(familyId, 'colores_star');
+        if (earned) newAchievements.push('colores_star');
+      }
+      // Logro especial: jugó los 3 juegos educativos
+      const wd = weeklyData;
+      if ((wd.letrasPlays||0) > 0 && (wd.numerosPlays||0) > 0 && (wd.coloresPlays||0) > 0) {
+        const earned = await awardAchievementIfNew(familyId, 'educador');
+        if (earned) newAchievements.push('educador');
       }
 
       await checkPointsAchievements(familyId, updatedGameState.points);
@@ -1231,98 +1261,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(500).json({ error: "Error al exportar datos" });
     }
-  });
-
-  // ─── Sincronización de cola offline ────────────────────────────────────────
-  app.post("/api/sync/offline-queue", requireAuth, async (req, res) => {
-    const familyId = req.session.familyId!;
-    const { actions } = req.body as {
-      actions: Array<{
-        id: string;
-        type: string;
-        payload: Record<string, unknown>;
-        timestamp: string;
-      }>;
-    };
-
-    if (!Array.isArray(actions) || actions.length === 0) {
-      return res.json({ synced: 0 });
-    }
-
-    let synced = 0;
-    const errors: string[] = [];
-
-    for (const action of actions) {
-      try {
-        if (action.type === "use-item") {
-          const { petId, itemType } = action.payload as {
-            petId: string;
-            itemType: string;
-          };
-          const pet = await storage.getPet(familyId);
-          const inventory = await storage.getInventory(familyId);
-          const gameState = await storage.getGameState(familyId);
-          if (!pet || !inventory || !gameState) continue;
-
-          const item = {
-            basicFood: { stat: "hunger" as const, amount: 30, field: "basicFood" },
-            snack:     { stat: "hunger" as const, amount: 60, field: "snack" },
-            ball:      { stat: "happiness" as const, amount: 30, field: "ball" },
-            rope:      { stat: "happiness" as const, amount: 60, field: "rope" },
-            medicine:  { stat: "health" as const, amount: 30, field: "medicine" },
-          }[itemType];
-
-          if (!item) continue;
-          const inventoryField = item.field as keyof typeof inventory;
-          if ((inventory[inventoryField] as number) <= 0) continue;
-
-          const newVal = Math.min(100, (pet[item.stat] as number) + item.amount);
-          await storage.updatePet(pet.id, { [item.stat]: newVal });
-          await storage.updateInventory(inventory.id, {
-            [inventoryField]: (inventory[inventoryField] as number) - 1,
-          });
-          synced++;
-
-        } else if (action.type === "complete-mission") {
-          const { missionId } = action.payload as { missionId: string };
-          const mission = await storage.getMission(missionId);
-          if (!mission || mission.familyId !== familyId) continue;
-          if (mission.completed) continue;
-          await storage.updateMission(missionId, {
-            completed: true,
-            completedAt: action.timestamp,
-          });
-          synced++;
-
-        } else if (action.type === "submit-score") {
-          // Los scores de minijuegos solo se usan para logros — registrar en gameState
-          const { gameType, score } = action.payload as {
-            gameType: string;
-            score: number;
-          };
-          const weekId = getWeekId(new Date(action.timestamp));
-          const gameState = await storage.getGameState(familyId);
-          if (!gameState) continue;
-
-          const weeklyData = getWeeklyGameData(gameState, weekId);
-          if (gameType === "memory") {
-            weeklyData.memoryPlays++;
-            weeklyData.memoryBestScore = Math.max(weeklyData.memoryBestScore, score);
-          } else if (gameType === "catch") {
-            weeklyData.catchPlays++;
-            weeklyData.catchBestScore = Math.max(weeklyData.catchBestScore, score);
-          }
-          await storage.updateGameState(gameState.id, {
-            weeklyGameData: JSON.stringify(weeklyData),
-          });
-          synced++;
-        }
-      } catch (err) {
-        errors.push(`${action.type}@${action.timestamp}: ${String(err)}`);
-      }
-    }
-
-    res.json({ synced, total: actions.length, errors });
   });
 
   const httpServer = createServer(app);

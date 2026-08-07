@@ -180,4 +180,11 @@ export interface WeeklyGameData {
   catchPlays: number;
   memoryBestScore: number;
   catchBestScore: number;
+  // Juegos educativos
+  letrasPlays: number;
+  letrasBestScore: number;
+  numerosPlays: number;
+  numerosBestScore: number;
+  coloresPlays: number;
+  coloresBestScore: number;
 }
