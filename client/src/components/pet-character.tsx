@@ -81,9 +81,16 @@ export function PetCharacter({ petType, state, bodyColor, equipped }: PetCharact
       </g>
 
       <g className={state === 'sleeping' ? 'pet-body-breathe' : state === 'sick' ? 'pet-body-shiver' : state === 'happy' ? 'pet-body-bounce' : ''}>
+        {/* Torso con volumen */}
+        <ellipse cx="60" cy="84" rx="27" ry="21" fill={c.dark} opacity="0.3" />
         <ellipse cx="60" cy="82" rx="27" ry="20" fill={c.body} />
+        {/* Brillo superior del torso */}
+        <ellipse cx="52" cy="70" rx="10" ry="6" fill="white" opacity="0.12" />
+        {/* Barriga */}
         <ellipse cx="60" cy="86" rx="16" ry="12" fill={c.belly} />
-        {petType === '🐶' && <ellipse cx="72" cy="76" rx="6" ry="5" fill={c.spot} opacity="0.5" />}
+        <ellipse cx="60" cy="84" rx="10" ry="7" fill="white" opacity="0.10" />
+        {petType === '🐶' && <ellipse cx="72" cy="76" rx="6" ry="5" fill={c.spot} opacity="0.45" />}
+        {petType === '🐶' && <ellipse cx="50" cy="80" rx="4" ry="3" fill={c.spot} opacity="0.25" />}
         {equipped?.collar && renderCollar(equipped.collar)}
       </g>
 
@@ -97,18 +104,36 @@ export function PetCharacter({ petType, state, bodyColor, equipped }: PetCharact
       </g>
 
       <g className={state === 'sleeping' ? 'pet-body-breathe' : state === 'sick' ? 'pet-body-shiver' : state === 'happy' ? 'pet-body-bounce' : ''}>
+        {/* Cabeza con volumen */}
+        <circle cx="60" cy="45" r="30" fill={c.dark} opacity="0.25" />
         <circle cx="60" cy="44" r="30" fill={c.body} />
+        {/* Brillo cabeza */}
+        <ellipse cx="48" cy="32" rx="11" ry="8" fill="white" opacity="0.18" />
 
         {renderEars(petType, c, state)}
 
+        {/* Cara blanca / mejilla */}
         <ellipse cx="60" cy="54" rx="18" ry="14" fill={c.belly} />
+        <ellipse cx="60" cy="51" rx="12" ry="8" fill="white" opacity="0.08" />
 
         {equipped?.glasses && renderGlasses(equipped.glasses)}
 
         {renderEyes(state, c)}
 
         <ellipse cx="60" cy="52" rx="4.5" ry="3.5" fill={c.nose} />
-        <ellipse cx="59" cy="51.5" rx="1.8" ry="1" fill="rgba(255,255,255,0.3)" />
+        <ellipse cx="58" cy="50.5" rx="1.8" ry="1.1" fill="rgba(255,255,255,0.45)" />
+        <ellipse cx="61" cy="52.5" rx="0.8" ry="0.5" fill="rgba(255,255,255,0.25)" />
+        {/* Bigotes del gato */}
+        {petType === '🐱' && (
+          <g stroke={c.dark} strokeWidth="0.8" strokeLinecap="round" opacity="0.7">
+            <line x1="30" y1="52" x2="52" y2="54" />
+            <line x1="28" y1="55" x2="52" y2="55" />
+            <line x1="30" y1="58" x2="52" y2="56" />
+            <line x1="90" y1="52" x2="68" y2="54" />
+            <line x1="92" y1="55" x2="68" y2="55" />
+            <line x1="90" y1="58" x2="68" y2="56" />
+          </g>
+        )}
 
         {renderMouth(state)}
 
@@ -138,33 +163,70 @@ function renderHat(hatId: string) {
     case 'hat_cowboy':
       return (
         <g>
-          <ellipse cx="60" cy="16" rx="28" ry="5" fill="#8B6914" />
-          <rect x="42" y="4" width="36" height="14" rx="6" fill="#A0792C" />
-          <ellipse cx="60" cy="4" rx="18" ry="5" fill="#B8912E" />
-          <rect x="55" y="8" width="10" height="6" rx="2" fill="#6B4E10" />
+          {/* Ala del sombrero */}
+          <ellipse cx="60" cy="17" rx="30" ry="6" fill="#6B4E10" />
+          <ellipse cx="60" cy="16" rx="29" ry="5.5" fill="#8B6914" />
+          {/* Copa */}
+          <rect x="43" y="3" width="34" height="15" rx="5" fill="#7a5c10" />
+          <rect x="44" y="4" width="32" height="13" rx="4" fill="#A0792C" />
+          {/* Parte superior */}
+          <ellipse cx="60" cy="4" rx="17" ry="5" fill="#B8912E" />
+          <ellipse cx="60" cy="3.5" rx="14" ry="3.5" fill="#c9a040" />
+          {/* Banda decorativa */}
+          <rect x="43" y="13" width="34" height="4" rx="1" fill="#5a3e0a" />
+          <rect x="43" y="13" width="34" height="2" rx="1" fill="#8B6914" opacity="0.6" />
+          {/* Hebilla */}
+          <rect x="56" y="13" width="8" height="4" rx="1" fill="#ffd700" />
+          <rect x="57.5" y="14" width="5" height="2" rx="0.5" fill="#b8860b" />
         </g>
       );
     case 'hat_crown':
       return (
         <g>
-          <rect x="42" y="8" width="36" height="14" rx="3" fill="#FFD700" />
-          <polygon points="42,8 48,0 54,8" fill="#FFD700" />
-          <polygon points="54,8 60,0 66,8" fill="#FFD700" />
-          <polygon points="66,8 72,0 78,8" fill="#FFD700" />
-          <circle cx="48" cy="3" r="2" fill="#E53935" />
-          <circle cx="60" cy="3" r="2" fill="#1E88E5" />
-          <circle cx="72" cy="3" r="2" fill="#43A047" />
-          <rect x="42" y="18" width="36" height="3" rx="1" fill="#FFC107" />
+          {/* Base dorada */}
+          <rect x="40" y="10" width="40" height="13" rx="3" fill="#b8860b" />
+          <rect x="41" y="9" width="38" height="13" rx="3" fill="#FFD700" />
+          {/* Púas de la corona */}
+          <polygon points="41,9 47,-2 53,9" fill="#b8860b" />
+          <polygon points="42,9 47,-1 52,9" fill="#FFD700" />
+          <polygon points="53,9 60,-4 67,9" fill="#b8860b" />
+          <polygon points="54,9 60,-3 66,9" fill="#ffd700" />
+          <polygon points="67,9 73,-2 79,9" fill="#b8860b" />
+          <polygon points="68,9 73,-1 78,9" fill="#FFD700" />
+          {/* Joyas en las púas */}
+          <circle cx="47" cy="0" r="2.5" fill="#E53935" stroke="#8b0000" strokeWidth="0.5"/>
+          <circle cx="60" cy="-2" r="2.5" fill="#1E88E5" stroke="#00008b" strokeWidth="0.5"/>
+          <circle cx="73" cy="0" r="2.5" fill="#43A047" stroke="#006400" strokeWidth="0.5"/>
+          {/* Franja inferior */}
+          <rect x="41" y="18" width="38" height="4" rx="2" fill="#FFC107" />
+          {/* Joyas en la franja */}
+          <circle cx="52" cy="20" r="2" fill="#E53935" />
+          <circle cx="60" cy="20" r="2.5" fill="#fff" stroke="#FFD700" strokeWidth="0.5" />
+          <circle cx="68" cy="20" r="2" fill="#1E88E5" />
+          {/* Brillo */}
+          <ellipse cx="52" cy="12" rx="8" ry="3" fill="white" opacity="0.2" />
         </g>
       );
     case 'hat_wizard':
       return (
         <g>
-          <polygon points="60,-10 42,18 78,18" fill="#5C3D99" />
-          <ellipse cx="60" cy="18" rx="22" ry="5" fill="#7B52B5" />
-          <circle cx="55" cy="6" r="2" fill="#FFD54F" />
-          <circle cx="63" cy="0" r="1.5" fill="#FFD54F" />
-          <circle cx="58" cy="-4" r="2.5" fill="#FFD54F" />
+          {/* Sombra del sombrero */}
+          <polygon points="60,-12 40,20 80,20" fill="#3b1f6e" opacity="0.4" />
+          {/* Cuerpo del sombrero */}
+          <polygon points="60,-12 41,18 79,18" fill="#4a2d88" />
+          <polygon points="60,-11 42,18 78,18" fill="#5C3D99" />
+          {/* Ala */}
+          <ellipse cx="60" cy="18" rx="23" ry="5.5" fill="#4a2d88" />
+          <ellipse cx="60" cy="17.5" rx="22" ry="5" fill="#7B52B5" />
+          {/* Estrellas y lunas */}
+          <text x="52" y="10" fontSize="7" fill="#fbbf24">★</text>
+          <text x="61" y="4" fontSize="5" fill="#fde68a">☽</text>
+          <text x="55" y="2" fontSize="6" fill="#fbbf24">✦</text>
+          {/* Brillos */}
+          <circle cx="65" cy="6" r="1.5" fill="#FFD54F" opacity="0.9" />
+          <circle cx="56" cy="12" r="1" fill="#a78bfa" opacity="0.8" />
+          {/* Brillo en el ala */}
+          <ellipse cx="50" cy="17" rx="8" ry="2" fill="white" opacity="0.12" />
         </g>
       );
     case 'hat_party':
@@ -196,9 +258,16 @@ function renderCollar(collarId: string) {
     case 'collar_bowtie':
       return (
         <g>
-          <polygon points="52,68 60,72 60,68" fill="#E53935" />
-          <polygon points="68,68 60,72 60,68" fill="#C62828" />
-          <circle cx="60" cy="69" r="2.5" fill="#FF5252" />
+          {/* Lazo izquierdo */}
+          <path d="M44 66 Q52 70 60 69 L52 74 Q44 72 44 66Z" fill="#E53935" />
+          <path d="M44 66 Q52 68 60 69 L52 72 Q44 70 44 66Z" fill="#FF5252" opacity="0.6"/>
+          {/* Lazo derecho */}
+          <path d="M76 66 Q68 70 60 69 L68 74 Q76 72 76 66Z" fill="#C62828" />
+          <path d="M76 66 Q68 68 60 69 L68 72 Q76 70 76 66Z" fill="#E53935" opacity="0.6"/>
+          {/* Nudo central */}
+          <circle cx="60" cy="69" r="3.5" fill="#FF5252" />
+          <circle cx="60" cy="69" r="2" fill="#FF7575" />
+          <circle cx="59" cy="68" r="0.8" fill="white" opacity="0.5"/>
         </g>
       );
     case 'collar_bandana':
@@ -211,9 +280,14 @@ function renderCollar(collarId: string) {
     case 'collar_bell':
       return (
         <g>
+          <path d="M38 66 Q60 62 82 66" stroke="#c62828" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.5"/>
           <path d="M38 66 Q60 62 82 66" stroke="#E53935" strokeWidth="3" fill="none" strokeLinecap="round" />
-          <circle cx="60" cy="72" r="5" fill="#FFD54F" stroke="#F9A825" strokeWidth="1" />
-          <circle cx="60" cy="73" r="1.5" fill="#F9A825" />
+          {/* Campana más detallada */}
+          <path d="M55 69 Q55 78 60 80 Q65 78 65 69 Q62 67 60 67 Q58 67 55 69Z" fill="#F9A825" />
+          <path d="M55 69 Q55 74 60 76" stroke="#fbbf24" strokeWidth="1" fill="none" opacity="0.6"/>
+          <ellipse cx="60" cy="68.5" rx="5" ry="2" fill="#FFD54F" />
+          <circle cx="60" cy="80" r="2" fill="#b45309" />
+          <circle cx="57" cy="71" r="1" fill="white" opacity="0.5"/>
         </g>
       );
     case 'collar_ribbon':
@@ -262,13 +336,19 @@ function renderGlasses(glassesId: string) {
     case 'glasses_round':
       return (
         <g>
-          <circle cx="46" cy="40" r="9" fill="none" stroke="#5D4037" strokeWidth="2" />
-          <circle cx="74" cy="40" r="9" fill="none" stroke="#5D4037" strokeWidth="2" />
-          <line x1="55" y1="40" x2="65" y2="40" stroke="#5D4037" strokeWidth="2" />
+          {/* Sombra */}
+          <circle cx="46" cy="41" r="9.5" fill="rgba(0,0,0,0.1)" />
+          <circle cx="74" cy="41" r="9.5" fill="rgba(0,0,0,0.1)" />
+          {/* Lente */}
+          <circle cx="46" cy="40" r="9" fill="rgba(180,220,255,0.25)" stroke="#5D4037" strokeWidth="2.2" />
+          <circle cx="74" cy="40" r="9" fill="rgba(180,220,255,0.25)" stroke="#5D4037" strokeWidth="2.2" />
+          {/* Puente y patillas */}
+          <line x1="55" y1="40" x2="65" y2="40" stroke="#5D4037" strokeWidth="2.2" />
           <line x1="37" y1="38" x2="30" y2="36" stroke="#5D4037" strokeWidth="2" />
           <line x1="83" y1="38" x2="90" y2="36" stroke="#5D4037" strokeWidth="2" />
-          <circle cx="46" cy="40" r="8" fill="rgba(255,255,255,0.15)" />
-          <circle cx="74" cy="40" r="8" fill="rgba(255,255,255,0.15)" />
+          {/* Brillo en los lentes */}
+          <ellipse cx="41" cy="35" rx="3.5" ry="2" fill="white" opacity="0.5" transform="rotate(-20 41 35)" />
+          <ellipse cx="69" cy="35" rx="3.5" ry="2" fill="white" opacity="0.5" transform="rotate(-20 69 35)" />
         </g>
       );
     case 'glasses_heart':
@@ -319,15 +399,15 @@ function renderTail(type: string, c: PetColors, state: PetState) {
     );
   }
   return (
-    <path
-      className={`pet-part-tail ${wagClass}`}
-      d="M88 74 Q102 56 98 42"
-      stroke={c.dark}
-      strokeWidth="6"
-      fill="none"
-      strokeLinecap="round"
-      style={{ transformOrigin: '88px 74px' }}
-    />
+    <g className={`pet-part-tail ${wagClass}`} style={{ transformOrigin: '88px 74px' }}>
+      {/* Cola esponjosa: 3 capas */}
+      <path d="M88 74 Q104 55 100 40" stroke={c.dark} strokeWidth="10" fill="none" strokeLinecap="round" opacity="0.3"/>
+      <path d="M88 74 Q103 56 99 41" stroke={c.body} strokeWidth="8" fill="none" strokeLinecap="round"/>
+      <path d="M88 74 Q102 57 98 42" stroke={c.dark} strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.4"/>
+      {/* Punta esponjosa */}
+      <circle cx="99" cy="40" r="6" fill={c.body} />
+      <circle cx="99" cy="39" r="4" fill={c.belly} opacity="0.6" />
+    </g>
   );
 }
 
@@ -356,10 +436,16 @@ function renderEars(type: string, c: PetColors, state: PetState) {
   }
   return (
     <g className={`pet-part-ears ${droopClass}`}>
+      {/* Oreja izquierda */}
+      <ellipse cx="32" cy="34" rx="10" ry="18" fill={c.dark} opacity="0.4" transform="rotate(-10 32 36)" />
       <ellipse cx="32" cy="34" rx="10" ry="18" fill={c.ear} transform="rotate(-10 32 34)" />
       <ellipse cx="33" cy="36" rx="5" ry="12" fill={c.earInner} transform="rotate(-10 33 36)" />
+      <ellipse cx="33" cy="33" rx="2.5" ry="5" fill="white" opacity="0.1" transform="rotate(-10 33 33)" />
+      {/* Oreja derecha */}
+      <ellipse cx="88" cy="34" rx="10" ry="18" fill={c.dark} opacity="0.4" transform="rotate(10 88 36)" />
       <ellipse cx="88" cy="34" rx="10" ry="18" fill={c.ear} transform="rotate(10 88 34)" />
       <ellipse cx="87" cy="36" rx="5" ry="12" fill={c.earInner} transform="rotate(10 87 36)" />
+      <ellipse cx="87" cy="33" rx="2.5" ry="5" fill="white" opacity="0.1" transform="rotate(10 87 33)" />
     </g>
   );
 }
@@ -420,12 +506,21 @@ function renderEyes(state: PetState, c: PetColors) {
     default:
       return (
         <g className="pet-part-eyes pet-eyes-blink">
-          <circle cx="48" cy="40" r="6" fill="white" />
-          <circle cx="72" cy="40" r="6" fill="white" />
-          <circle cx="49" cy="40" r="4" fill="#3D2C20" className="pet-pupil-look" />
-          <circle cx="73" cy="40" r="4" fill="#3D2C20" className="pet-pupil-look" />
-          <circle cx="50.5" cy="38.5" r="1.8" fill="white" />
-          <circle cx="74.5" cy="38.5" r="1.8" fill="white" />
+          {/* Esclerótidas */}
+          <circle cx="48" cy="40" r="6.5" fill="white" />
+          <circle cx="72" cy="40" r="6.5" fill="white" />
+          {/* Iris */}
+          <circle cx="49" cy="40" r="4.5" fill="#5a3e28" className="pet-pupil-look" />
+          <circle cx="73" cy="40" r="4.5" fill="#5a3e28" className="pet-pupil-look" />
+          {/* Pupila */}
+          <circle cx="49" cy="40" r="2.8" fill="#1a0f00" className="pet-pupil-look" />
+          <circle cx="73" cy="40" r="2.8" fill="#1a0f00" className="pet-pupil-look" />
+          {/* Brillo grande */}
+          <circle cx="51" cy="37.5" r="2" fill="white" />
+          <circle cx="75" cy="37.5" r="2" fill="white" />
+          {/* Brillo pequeño */}
+          <circle cx="47.5" cy="42" r="0.8" fill="white" opacity="0.6" />
+          <circle cx="71.5" cy="42" r="0.8" fill="white" opacity="0.6" />
         </g>
       );
   }

@@ -474,10 +474,27 @@ export function PetDisplay({ pet, cosmetics = [], gameState, playAnimation }: Pe
         {isDefaultTheme && !isSleeping && (
           <div className="habitat-clouds">
             <div className="habitat-cloud habitat-cloud-1">
-              <svg width="70" height="30" viewBox="0 0 70 30"><ellipse cx="35" cy="20" rx="28" ry="10" fill="white" opacity="0.5" /><ellipse cx="24" cy="15" rx="16" ry="10" fill="white" opacity="0.4" /><ellipse cx="46" cy="13" rx="16" ry="11" fill="white" opacity="0.4" /></svg>
+              <svg width="80" height="36" viewBox="0 0 80 36">
+                {/* Sombra nube */}
+                <ellipse cx="40" cy="28" rx="30" ry="9" fill="#e0f2fe" opacity="0.5" />
+                {/* Cuerpo principal */}
+                <ellipse cx="40" cy="22" rx="30" ry="11" fill="white" opacity="0.9" />
+                {/* Protuberancias */}
+                <ellipse cx="22" cy="17" rx="16" ry="12" fill="white" opacity="0.95" />
+                <ellipse cx="40" cy="13" rx="18" ry="14" fill="white" />
+                <ellipse cx="58" cy="16" rx="16" ry="12" fill="white" opacity="0.95" />
+                {/* Brillo */}
+                <ellipse cx="30" cy="11" rx="8" ry="4" fill="white" opacity="0.6" />
+              </svg>
             </div>
             <div className="habitat-cloud habitat-cloud-2">
-              <svg width="50" height="22" viewBox="0 0 50 22"><ellipse cx="25" cy="14" rx="20" ry="8" fill="white" opacity="0.35" /><ellipse cx="18" cy="10" rx="12" ry="8" fill="white" opacity="0.3" /><ellipse cx="34" cy="9" rx="12" ry="8" fill="white" opacity="0.3" /></svg>
+              <svg width="55" height="26" viewBox="0 0 55 26">
+                <ellipse cx="27" cy="19" rx="22" ry="8" fill="white" opacity="0.85" />
+                <ellipse cx="18" cy="14" rx="13" ry="10" fill="white" opacity="0.9" />
+                <ellipse cx="27" cy="11" rx="15" ry="11" fill="white" />
+                <ellipse cx="38" cy="14" rx="13" ry="10" fill="white" opacity="0.9" />
+                <ellipse cx="22" cy="9" rx="6" ry="3" fill="white" opacity="0.5" />
+              </svg>
             </div>
           </div>
         )}
@@ -492,37 +509,72 @@ export function PetDisplay({ pet, cosmetics = [], gameState, playAnimation }: Pe
 
         {(isDefaultTheme || theme === 'bg_space') && isSleeping && (
           <div className="habitat-stars">
-            <span className="habitat-star habitat-star-1"><svg width="8" height="8" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#ffd54f" /></svg></span>
+            <span className="habitat-star habitat-star-1"><svg width="10" height="10" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#ffd54f" /><circle cx="5" cy="5" r="1.5" fill="white" opacity="0.7"/></svg></span>
             <span className="habitat-star habitat-star-2"><svg width="6" height="6" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#fff176" /></svg></span>
-            <span className="habitat-star habitat-star-3"><svg width="10" height="10" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#ffee58" /></svg></span>
+            <span className="habitat-star habitat-star-3"><svg width="12" height="12" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#ffee58" /><circle cx="5" cy="5" r="1.8" fill="white" opacity="0.6"/></svg></span>
             <span className="habitat-star habitat-star-4"><svg width="5" height="5" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#ffd54f" /></svg></span>
-            <span className="habitat-star habitat-star-5"><svg width="7" height="7" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#fff9c4" /></svg></span>
+            <span className="habitat-star habitat-star-5"><svg width="8" height="8" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#fff9c4" /></svg></span>
+            <span className="habitat-star habitat-star-1" style={{top:'15%',left:'55%'}}><svg width="7" height="7" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#e9d5ff" /></svg></span>
+            <span className="habitat-star habitat-star-2" style={{top:'30%',left:'75%'}}><svg width="9" height="9" viewBox="0 0 10 10"><polygon points="5,0 6.2,3.8 10,3.8 6.9,6.2 8.1,10 5,7.6 1.9,10 3.1,6.2 0,3.8 3.8,3.8" fill="#fde68a" /><circle cx="5" cy="5" r="1.5" fill="white" opacity="0.5"/></svg></span>
+            <span className="habitat-star habitat-star-3" style={{top:'8%',left:'35%'}}><svg width="5" height="5" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#c7d2fe" /></svg></span>
           </div>
         )}
 
         {isDefaultTheme && isSleeping && (
           <div className="habitat-moon">
-            <svg width="32" height="32" viewBox="0 0 32 32">
-              <circle cx="16" cy="16" r="12" fill="#ffd54f" opacity="0.9" />
-              <circle cx="20" cy="14" r="10" fill="#1e1b4b" opacity="0.85" />
+            <svg width="38" height="38" viewBox="0 0 38 38">
+              {/* Halo lunar */}
+              <circle cx="19" cy="19" r="17" fill="#fef9c3" opacity="0.12" />
+              {/* Luna creciente */}
+              <circle cx="19" cy="19" r="13" fill="#fde68a" />
+              <circle cx="24" cy="16" r="11" fill="#1e1b4b" />
+              {/* Brillo y detalle */}
+              <circle cx="12" cy="14" r="2" fill="#fef08a" opacity="0.5"/>
+              <circle cx="10" cy="22" r="1.2" fill="#fef08a" opacity="0.35"/>
+              <circle cx="14" cy="26" r="1.5" fill="#fef08a" opacity="0.3"/>
+              {/* Brillo superior */}
+              <ellipse cx="10" cy="12" rx="3" ry="2" fill="white" opacity="0.2" transform="rotate(-30 10 12)" />
             </svg>
           </div>
         )}
 
         {isDefaultTheme && !isSleeping && (
           <div className="habitat-sun-icon">
-            <svg width="28" height="28" viewBox="0 0 28 28">
-              <circle cx="14" cy="14" r="7" fill="#fbbf24" />
-              <g stroke="#fbbf24" strokeWidth="2" strokeLinecap="round">
-                <line x1="14" y1="2" x2="14" y2="5" />
-                <line x1="14" y1="23" x2="14" y2="26" />
-                <line x1="2" y1="14" x2="5" y2="14" />
-                <line x1="23" y1="14" x2="26" y2="14" />
-                <line x1="5.5" y1="5.5" x2="7.5" y2="7.5" />
-                <line x1="20.5" y1="20.5" x2="22.5" y2="22.5" />
-                <line x1="5.5" y1="22.5" x2="7.5" y2="20.5" />
-                <line x1="20.5" y1="7.5" x2="22.5" y2="5.5" />
+            <svg width="40" height="40" viewBox="0 0 40 40">
+              {/* Halo exterior */}
+              <circle cx="20" cy="20" r="18" fill="#fde68a" opacity="0.3" />
+              <circle cx="20" cy="20" r="14" fill="#fde68a" opacity="0.25" />
+              {/* Rayos largos */}
+              <g stroke="#f59e0b" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="20" y1="2" x2="20" y2="6" />
+                <line x1="20" y1="34" x2="20" y2="38" />
+                <line x1="2" y1="20" x2="6" y2="20" />
+                <line x1="34" y1="20" x2="38" y2="20" />
+                <line x1="6.2" y1="6.2" x2="9" y2="9" />
+                <line x1="31" y1="31" x2="33.8" y2="33.8" />
+                <line x1="6.2" y1="33.8" x2="9" y2="31" />
+                <line x1="31" y1="9" x2="33.8" y2="6.2" />
               </g>
+              {/* Rayos cortos intermedios */}
+              <g stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" opacity="0.7">
+                <line x1="20" y1="4" x2="20" y2="7" transform="rotate(22.5 20 20)" />
+                <line x1="20" y1="4" x2="20" y2="7" transform="rotate(67.5 20 20)" />
+                <line x1="20" y1="4" x2="20" y2="7" transform="rotate(112.5 20 20)" />
+                <line x1="20" y1="4" x2="20" y2="7" transform="rotate(157.5 20 20)" />
+                <line x1="20" y1="4" x2="20" y2="7" transform="rotate(202.5 20 20)" />
+                <line x1="20" y1="4" x2="20" y2="7" transform="rotate(247.5 20 20)" />
+                <line x1="20" y1="4" x2="20" y2="7" transform="rotate(292.5 20 20)" />
+                <line x1="20" y1="4" x2="20" y2="7" transform="rotate(337.5 20 20)" />
+              </g>
+              {/* Cuerpo del sol */}
+              <circle cx="20" cy="20" r="9" fill="#f59e0b" />
+              <circle cx="20" cy="20" r="8" fill="#fbbf24" />
+              {/* Cara del sol */}
+              <circle cx="17" cy="19" r="1.2" fill="#f59e0b" />
+              <circle cx="23" cy="19" r="1.2" fill="#f59e0b" />
+              <path d="M16.5 22 Q20 25 23.5 22" stroke="#f59e0b" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+              {/* Brillo */}
+              <ellipse cx="16" cy="15" rx="3" ry="2" fill="white" opacity="0.3" transform="rotate(-20 16 15)" />
             </svg>
           </div>
         )}
@@ -548,25 +600,69 @@ export function PetDisplay({ pet, cosmetics = [], gameState, playAnimation }: Pe
         <div className="habitat-ground">
           {isDefaultTheme && (
             <svg className="habitat-grass-svg" viewBox="0 0 400 30" preserveAspectRatio="none">
-              <path d="M0 12 Q5 2 10 12 Q15 2 20 12 Q25 2 30 12 Q35 2 40 12 Q45 2 50 12 Q55 2 60 12 Q65 2 70 12 Q75 2 80 12 Q85 2 90 12 Q95 2 100 12 Q105 2 110 12 Q115 2 120 12 Q125 2 130 12 Q135 2 140 12 Q145 2 150 12 Q155 2 160 12 Q165 2 170 12 Q175 2 180 12 Q185 2 190 12 Q195 2 200 12 Q205 2 210 12 Q215 2 220 12 Q225 2 230 12 Q235 2 240 12 Q245 2 250 12 Q255 2 260 12 Q265 2 270 12 Q275 2 280 12 Q285 2 290 12 Q295 2 300 12 Q305 2 310 12 Q315 2 320 12 Q325 2 330 12 Q335 2 340 12 Q345 2 350 12 Q355 2 360 12 Q365 2 370 12 Q375 2 380 12 Q385 2 390 12 Q395 2 400 12 L400 30 L0 30 Z" fill={isSleeping ? '#1a3a1a' : '#4ade80'} />
+              {/* Capa base del pasto */}
+              <path d="M0 14 Q5 4 10 14 Q15 4 20 14 Q25 4 30 14 Q35 4 40 14 Q45 4 50 14 Q55 4 60 14 Q65 4 70 14 Q75 4 80 14 Q85 4 90 14 Q95 4 100 14 Q105 4 110 14 Q115 4 120 14 Q125 4 130 14 Q135 4 140 14 Q145 4 150 14 Q155 4 160 14 Q165 4 170 14 Q175 4 180 14 Q185 4 190 14 Q195 4 200 14 Q205 4 210 14 Q215 4 220 14 Q225 4 230 14 Q235 4 240 14 Q245 4 250 14 Q255 4 260 14 Q265 4 270 14 Q275 4 280 14 Q285 4 290 14 Q295 4 300 14 Q305 4 310 14 Q315 4 320 14 Q325 4 330 14 Q335 4 340 14 Q345 4 350 14 Q355 4 360 14 Q365 4 370 14 Q375 4 380 14 Q385 4 390 14 Q395 4 400 14 L400 30 L0 30 Z" fill={isSleeping ? '#1a3a1a' : '#4ade80'} />
+              {/* Segunda capa más oscura para profundidad */}
+              <path d="M0 18 Q7 10 14 18 Q21 10 28 18 Q35 10 42 18 Q49 10 56 18 Q63 10 70 18 Q77 10 84 18 Q91 10 98 18 Q105 10 112 18 Q119 10 126 18 Q133 10 140 18 Q147 10 154 18 Q161 10 168 18 Q175 10 182 18 Q189 10 196 18 Q203 10 210 18 Q217 10 224 18 Q231 10 238 18 Q245 10 252 18 Q259 10 266 18 Q273 10 280 18 Q287 10 294 18 Q301 10 308 18 Q315 10 322 18 Q329 10 336 18 Q343 10 350 18 Q357 10 364 18 Q371 10 378 18 Q385 10 392 18 Q398 12 400 18 L400 30 L0 30 Z" fill={isSleeping ? '#163316' : '#22c55e'} opacity="0.7" />
+              {/* Detalle de suelo */}
+              <rect x="0" y="24" width="400" height="6" fill={isSleeping ? '#0f2a0f' : '#16a34a'} opacity="0.4" />
             </svg>
           )}
           {isDefaultTheme && (
             <div className="habitat-flowers">
-              <svg className="habitat-flower habitat-flower-1" width="12" height="16" viewBox="0 0 12 16">
-                <line x1="6" y1="8" x2="6" y2="16" stroke={isSleeping ? '#1a4a1a' : '#22c55e'} strokeWidth="1.5" />
-                <circle cx="6" cy="6" r="4" fill={isSleeping ? '#4a2040' : '#f472b6'} />
-                <circle cx="6" cy="6" r="2" fill={isSleeping ? '#6a3050' : '#fbbf24'} />
+              {/* Flor 1 - Margarita rosa */}
+              <svg className="habitat-flower habitat-flower-1" width="20" height="26" viewBox="0 0 20 26">
+                <path d="M10 14 Q8 20 10 26" stroke={isSleeping ? '#1a4a1a' : '#16a34a'} strokeWidth="2" fill="none" strokeLinecap="round"/>
+                <ellipse cx="7" cy="20" rx="3" ry="1.5" fill={isSleeping ? '#1a4a1a' : '#22c55e'} transform="rotate(-40 7 20)" />
+                <ellipse cx="10" cy="9" rx="2.2" ry="4" fill={isSleeping ? '#4a2040' : '#fda4af'} transform="rotate(0 10 13)" />
+                <ellipse cx="10" cy="9" rx="2.2" ry="4" fill={isSleeping ? '#4a2040' : '#fda4af'} transform="rotate(45 10 13)" />
+                <ellipse cx="10" cy="9" rx="2.2" ry="4" fill={isSleeping ? '#4a2040' : '#fda4af'} transform="rotate(90 10 13)" />
+                <ellipse cx="10" cy="9" rx="2.2" ry="4" fill={isSleeping ? '#4a2040' : '#fda4af'} transform="rotate(135 10 13)" />
+                <ellipse cx="10" cy="9" rx="2.2" ry="4" fill={isSleeping ? '#4a2040' : '#fda4af'} transform="rotate(180 10 13)" />
+                <ellipse cx="10" cy="9" rx="2.2" ry="4" fill={isSleeping ? '#4a2040' : '#fda4af'} transform="rotate(225 10 13)" />
+                <ellipse cx="10" cy="9" rx="2.2" ry="4" fill={isSleeping ? '#4a2040' : '#fda4af'} transform="rotate(270 10 13)" />
+                <ellipse cx="10" cy="9" rx="2.2" ry="4" fill={isSleeping ? '#4a2040' : '#fda4af'} transform="rotate(315 10 13)" />
+                <circle cx="10" cy="13" r="3.2" fill={isSleeping ? '#6a3050' : '#fbbf24'} />
+                <circle cx="10" cy="13" r="1.8" fill={isSleeping ? '#7a3060' : '#f59e0b'} />
+                <circle cx="9" cy="12.2" r="0.7" fill="white" opacity="0.5"/>
               </svg>
-              <svg className="habitat-flower habitat-flower-2" width="10" height="14" viewBox="0 0 10 14">
-                <line x1="5" y1="7" x2="5" y2="14" stroke={isSleeping ? '#1a4a1a' : '#22c55e'} strokeWidth="1.5" />
-                <circle cx="5" cy="5" r="3.5" fill={isSleeping ? '#3a3060' : '#a78bfa'} />
-                <circle cx="5" cy="5" r="1.5" fill={isSleeping ? '#5a4080' : '#fde68a'} />
+              {/* Flor 2 - Flor violeta */}
+              <svg className="habitat-flower habitat-flower-2" width="17" height="22" viewBox="0 0 17 22">
+                <path d="M8.5 12 Q6.5 17 8.5 22" stroke={isSleeping ? '#1a4a1a' : '#16a34a'} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                <ellipse cx="6" cy="17" rx="2.5" ry="1.3" fill={isSleeping ? '#1a4a1a' : '#22c55e'} transform="rotate(-35 6 17)" />
+                <ellipse cx="8.5" cy="7.5" rx="2" ry="3.5" fill={isSleeping ? '#3a3060' : '#c4b5fd'} transform="rotate(0 8.5 11)" />
+                <ellipse cx="8.5" cy="7.5" rx="2" ry="3.5" fill={isSleeping ? '#3a3060' : '#c4b5fd'} transform="rotate(60 8.5 11)" />
+                <ellipse cx="8.5" cy="7.5" rx="2" ry="3.5" fill={isSleeping ? '#3a3060' : '#c4b5fd'} transform="rotate(120 8.5 11)" />
+                <ellipse cx="8.5" cy="7.5" rx="2" ry="3.5" fill={isSleeping ? '#3a3060' : '#c4b5fd'} transform="rotate(180 8.5 11)" />
+                <ellipse cx="8.5" cy="7.5" rx="2" ry="3.5" fill={isSleeping ? '#3a3060' : '#c4b5fd'} transform="rotate(240 8.5 11)" />
+                <ellipse cx="8.5" cy="7.5" rx="2" ry="3.5" fill={isSleeping ? '#3a3060' : '#c4b5fd'} transform="rotate(300 8.5 11)" />
+                <circle cx="8.5" cy="11" r="2.8" fill={isSleeping ? '#5a4080' : '#fde68a'} />
+                <circle cx="8.5" cy="11" r="1.4" fill={isSleeping ? '#6a4090' : '#fbbf24'} />
               </svg>
-              <svg className="habitat-flower habitat-flower-3" width="10" height="12" viewBox="0 0 10 12">
-                <line x1="5" y1="6" x2="5" y2="12" stroke={isSleeping ? '#1a4a1a' : '#22c55e'} strokeWidth="1.5" />
-                <circle cx="5" cy="4" r="3" fill={isSleeping ? '#4a3020' : '#fb923c'} />
-                <circle cx="5" cy="4" r="1.5" fill={isSleeping ? '#6a4030' : '#fef08a'} />
+              {/* Flor 3 - Flor naranja */}
+              <svg className="habitat-flower habitat-flower-3" width="16" height="20" viewBox="0 0 16 20">
+                <path d="M8 11 Q6.5 15 8 20" stroke={isSleeping ? '#1a4a1a' : '#16a34a'} strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                <ellipse cx="5.5" cy="15" rx="2.5" ry="1.3" fill={isSleeping ? '#1a4a1a' : '#22c55e'} transform="rotate(-40 5.5 15)" />
+                <ellipse cx="8" cy="7" rx="1.8" ry="3.2" fill={isSleeping ? '#4a3020' : '#fdba74'} transform="rotate(0 8 10)" />
+                <ellipse cx="8" cy="7" rx="1.8" ry="3.2" fill={isSleeping ? '#4a3020' : '#fdba74'} transform="rotate(72 8 10)" />
+                <ellipse cx="8" cy="7" rx="1.8" ry="3.2" fill={isSleeping ? '#4a3020' : '#fdba74'} transform="rotate(144 8 10)" />
+                <ellipse cx="8" cy="7" rx="1.8" ry="3.2" fill={isSleeping ? '#4a3020' : '#fdba74'} transform="rotate(216 8 10)" />
+                <ellipse cx="8" cy="7" rx="1.8" ry="3.2" fill={isSleeping ? '#4a3020' : '#fdba74'} transform="rotate(288 8 10)" />
+                <circle cx="8" cy="10" r="2.5" fill={isSleeping ? '#6a4030' : '#fb923c'} />
+                <circle cx="8" cy="10" r="1.3" fill={isSleeping ? '#7a4040' : '#fef08a'} />
+                <circle cx="7.2" cy="9.2" r="0.6" fill="white" opacity="0.5"/>
+              </svg>
+              {/* Flor 4 - Flor pequeña azul */}
+              <svg className="habitat-flower habitat-flower-4" width="14" height="18" viewBox="0 0 14 18">
+                <path d="M7 10 Q5.5 14 7 18" stroke={isSleeping ? '#1a4a1a' : '#15803d'} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                <ellipse cx="7" cy="6" rx="1.6" ry="2.8" fill={isSleeping ? '#1a2040' : '#93c5fd'} transform="rotate(0 7 9)" />
+                <ellipse cx="7" cy="6" rx="1.6" ry="2.8" fill={isSleeping ? '#1a2040' : '#93c5fd'} transform="rotate(60 7 9)" />
+                <ellipse cx="7" cy="6" rx="1.6" ry="2.8" fill={isSleeping ? '#1a2040' : '#93c5fd'} transform="rotate(120 7 9)" />
+                <ellipse cx="7" cy="6" rx="1.6" ry="2.8" fill={isSleeping ? '#1a2040' : '#93c5fd'} transform="rotate(180 7 9)" />
+                <ellipse cx="7" cy="6" rx="1.6" ry="2.8" fill={isSleeping ? '#1a2040' : '#93c5fd'} transform="rotate(240 7 9)" />
+                <ellipse cx="7" cy="6" rx="1.6" ry="2.8" fill={isSleeping ? '#1a2040' : '#93c5fd'} transform="rotate(300 7 9)" />
+                <circle cx="7" cy="9" r="2.2" fill={isSleeping ? '#3a4060' : '#fef3c7'} />
+                <circle cx="7" cy="9" r="1.1" fill={isSleeping ? '#4a5070' : '#fbbf24'} />
               </svg>
             </div>
           )}
