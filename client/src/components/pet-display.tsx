@@ -248,11 +248,24 @@ function HouseDecorations({ isNight }: { isNight: boolean }) {
 
 function BowlBasic() {
   return (
-    <div className="habitat-bowl" style={{ position: 'absolute', bottom: '8px', left: '15px', zIndex: 2 }} data-testid="bowl-basic">
-      <svg width="28" height="18" viewBox="0 0 28 18">
-        <ellipse cx="14" cy="14" rx="14" ry="4" fill="#a8a29e" />
-        <path d="M2 10 Q2 18 14 18 Q26 18 26 10 L24 6 Q14 8 4 6 Z" fill="#d6d3d1" />
-        <ellipse cx="14" cy="6" rx="11" ry="3" fill="#e7e5e4" />
+    <div style={{ position: 'absolute', bottom: '10px', left: '8px', zIndex: 3 }} data-testid="bowl-basic">
+      <svg width="64" height="44" viewBox="0 0 64 44">
+        {/* Sombra */}
+        <ellipse cx="32" cy="42" rx="28" ry="3" fill="rgba(0,0,0,0.15)" />
+        {/* Base del cuenco */}
+        <ellipse cx="32" cy="36" rx="26" ry="6" fill="#a8a29e" />
+        {/* Cuerpo */}
+        <path d="M6 22 Q6 38 32 40 Q58 38 58 22 L54 12 Q32 16 10 12 Z" fill="#d6d3d1" />
+        {/* Borde superior */}
+        <ellipse cx="32" cy="13" rx="23" ry="6" fill="#e7e5e4" />
+        <ellipse cx="32" cy="13" rx="19" ry="4" fill="#c8c4c0" />
+        {/* Contenido (comida) */}
+        <ellipse cx="32" cy="14" rx="15" ry="3" fill="#f59e0b" opacity="0.7" />
+        <circle cx="26" cy="13" r="2" fill="#d97706" />
+        <circle cx="32" cy="12" r="2.5" fill="#d97706" />
+        <circle cx="38" cy="13" r="2" fill="#d97706" />
+        {/* Línea decorativa */}
+        <path d="M12 28 Q32 32 52 28" stroke="#b8b4b0" strokeWidth="1" fill="none" opacity="0.6"/>
       </svg>
     </div>
   );
@@ -260,37 +273,101 @@ function BowlBasic() {
 
 function BowlSpecial() {
   return (
-    <div className="habitat-bowl" style={{ position: 'absolute', bottom: '8px', left: '12px', zIndex: 2 }} data-testid="bowl-special">
-      <svg width="38" height="24" viewBox="0 0 38 24">
-        <ellipse cx="19" cy="20" rx="18" ry="4" fill="#0d9488" />
-        <path d="M2 14 Q2 24 19 24 Q36 24 36 14 L33 8 Q19 10 5 8 Z" fill="#14b8a6" />
-        <ellipse cx="19" cy="8" rx="15" ry="4" fill="#2dd4bf" />
-        <circle cx="12" cy="16" r="1.5" fill="#0f766e" />
-        <circle cx="15" cy="14" r="1" fill="#0f766e" />
-        <circle cx="10" cy="14" r="1" fill="#0f766e" />
-        <circle cx="12" cy="12.5" r="0.8" fill="#0f766e" />
+    <div style={{ position: 'absolute', bottom: '10px', left: '6px', zIndex: 3 }} data-testid="bowl-special">
+      <svg width="80" height="54" viewBox="0 0 80 54">
+        {/* Sombra */}
+        <ellipse cx="40" cy="52" rx="34" ry="3.5" fill="rgba(0,0,0,0.18)" />
+        {/* Base dorada */}
+        <ellipse cx="40" cy="46" rx="32" ry="7" fill="#b45309" />
+        <ellipse cx="40" cy="44" rx="30" ry="6" fill="#d97706" />
+        {/* Cuerpo del cuenco dorado */}
+        <path d="M8 26 Q8 46 40 50 Q72 46 72 26 L68 14 Q40 20 12 14 Z" fill="#f59e0b" />
+        {/* Brillo lateral */}
+        <path d="M14 20 Q14 40 40 44" stroke="#fbbf24" strokeWidth="2" fill="none" opacity="0.6"/>
+        {/* Borde superior */}
+        <ellipse cx="40" cy="15" rx="30" ry="8" fill="#fbbf24" />
+        <ellipse cx="40" cy="14" rx="26" ry="6" fill="#fde68a" />
+        <ellipse cx="40" cy="14" rx="21" ry="4.5" fill="#f59e0b" />
+        {/* Contenido (agua/comida premium) */}
+        <ellipse cx="40" cy="15" rx="18" ry="3.5" fill="#7dd3fc" opacity="0.8" />
+        <ellipse cx="40" cy="14" rx="14" ry="2" fill="#bae6fd" opacity="0.9" />
+        {/* Joyas decorativas en el borde */}
+        <circle cx="22" cy="15" r="2.5" fill="#ec4899" stroke="#be185d" strokeWidth="0.5"/>
+        <circle cx="40" cy="8" r="2.5" fill="#8b5cf6" stroke="#6d28d9" strokeWidth="0.5"/>
+        <circle cx="58" cy="15" r="2.5" fill="#10b981" stroke="#059669" strokeWidth="0.5"/>
+        <circle cx="16" cy="24" r="2" fill="#f472b6" stroke="#db2777" strokeWidth="0.5"/>
+        <circle cx="64" cy="24" r="2" fill="#a78bfa" stroke="#7c3aed" strokeWidth="0.5"/>
+        {/* Estrellas flotantes */}
+        <text x="30" y="36" fontSize="8" fill="#fef08a" opacity="0.9">✦</text>
+        <text x="44" y="32" fontSize="6" fill="#fef08a" opacity="0.8">✦</text>
+        <text x="50" y="38" fontSize="7" fill="#fef08a" opacity="0.7">✦</text>
       </svg>
     </div>
   );
 }
 
-function HouseBasicSvg() {
+function HouseBasicSvg({ isSleeping = false }: { isSleeping?: boolean }) {
   return (
-    <div style={{ position: 'absolute', bottom: '0', right: '10px', zIndex: 2 }} data-testid="house-basic">
-      <svg width="50" height="55" viewBox="0 0 50 55">
-        <rect x="5" y="22" width="40" height="33" fill="#92400e" />
-        <rect x="7" y="24" width="36" height="29" fill="#b45309" />
-        <polygon points="0,24 25,2 50,24" fill="#dc2626" />
-        <polygon points="3,24 25,5 47,24" fill="#ef4444" />
-        <rect x="18" y="30" width="8" height="8" fill="#fef3c7" stroke="#78350f" strokeWidth="1" />
-        <line x1="22" y1="30" x2="22" y2="38" stroke="#78350f" strokeWidth="0.5" />
-        <line x1="18" y1="34" x2="26" y2="34" stroke="#78350f" strokeWidth="0.5" />
+    <div style={{ position: 'absolute', bottom: '0', right: '6px', zIndex: 2 }} data-testid="house-basic">
+      <svg width="130" height="112" viewBox="0 0 130 112">
+        {/* Sombra */}
+        <ellipse cx="65" cy="110" rx="58" ry="5" fill="rgba(0,0,0,0.18)" />
+        {/* Cuerpo de la casita */}
+        <rect x="8" y="46" width="114" height="66" rx="3" fill="#92400e" />
+        {/* Tablas de madera */}
+        <rect x="8" y="46" width="114" height="66" rx="3" fill="#b45309" />
+        <line x1="8" y1="58" x2="122" y2="58" stroke="#78350f" strokeWidth="1.8" opacity="0.7"/>
+        <line x1="8" y1="70" x2="122" y2="70" stroke="#78350f" strokeWidth="1.8" opacity="0.7"/>
+        <line x1="8" y1="82" x2="122" y2="82" stroke="#78350f" strokeWidth="1.8" opacity="0.7"/>
+        <line x1="8" y1="94" x2="122" y2="94" stroke="#78350f" strokeWidth="1.8" opacity="0.7"/>
+        {/* Tejado */}
+        <polygon points="0,48 65,4 130,48" fill="#b91c1c" />
+        <polygon points="4,48 65,8 126,48" fill="#dc2626" />
+        <polygon points="8,48 65,12 122,48" fill="#ef4444" />
+        {/* Chimenea */}
+        <rect x="88" y="10" width="14" height="28" fill="#a16207" />
+        <rect x="85" y="8" width="20" height="7" rx="1" fill="#ca8a04" />
+        {/* Humo cuando está durmiendo */}
+        {isSleeping && (
+          <>
+            <circle cx="95" cy="4" r="3" fill="#d1d5db" opacity="0.6"/>
+            <circle cx="98" cy="0" r="2" fill="#d1d5db" opacity="0.4"/>
+          </>
+        )}
+        {/* Ventana izquierda */}
+        <rect x="14" y="52" width="22" height="20" rx="2" fill={isSleeping ? "#fde68a" : "#bae6fd"} stroke="#78350f" strokeWidth="2"/>
+        <line x1="25" y1="52" x2="25" y2="72" stroke="#78350f" strokeWidth="1.2"/>
+        <line x1="14" y1="62" x2="36" y2="62" stroke="#78350f" strokeWidth="1.2"/>
+        {/* Ventana derecha */}
+        <rect x="94" y="52" width="22" height="20" rx="2" fill={isSleeping ? "#fde68a" : "#bae6fd"} stroke="#78350f" strokeWidth="2"/>
+        <line x1="105" y1="52" x2="105" y2="72" stroke="#78350f" strokeWidth="1.2"/>
+        <line x1="94" y1="62" x2="116" y2="62" stroke="#78350f" strokeWidth="1.2"/>
+        {/* Interior del arco (oscuro o con luz nocturna) */}
+        <path d="M40,112 L40,76 Q65,54 90,76 L90,112 Z" fill={isSleeping ? "#1a0800" : "#1a0800"}/>
+        {/* Cálida luz dentro si está durmiendo */}
+        {isSleeping && (
+          <path d="M44,112 L44,78 Q65,58 86,78 L86,112 Z" fill="#7c2d12" opacity="0.5"/>
+        )}
+        {/* Marco del arco */}
+        <path d="M38,112 L38,75 Q65,51 92,75 L92,112"
+          stroke="#78350f" strokeWidth="3" fill="none"/>
+        {/* Placa con nombre */}
+        <rect x="50" y="44" width="30" height="10" rx="2" fill="#fef3c7" stroke="#92400e" strokeWidth="1"/>
+        <text x="65" y="52" textAnchor="middle" fontSize="6" fill="#78350f" fontWeight="bold">MI CASA</text>
+        {/* Zzzs si duerme */}
+        {isSleeping && (
+          <>
+            <text x="56" y="90" fontSize="10" fill="#a5b4fc" opacity="0.9" fontWeight="bold">z</text>
+            <text x="62" y="82" fontSize="8" fill="#a5b4fc" opacity="0.7" fontWeight="bold">z</text>
+            <text x="67" y="75" fontSize="6" fill="#a5b4fc" opacity="0.5" fontWeight="bold">z</text>
+          </>
+        )}
       </svg>
     </div>
   );
 }
 
-function HouseFancySvg() {
+function HouseFancySvg({ isSleeping = false }: { isSleeping?: boolean }) {
   return (
     <div style={{ position: 'absolute', bottom: '0', right: '8px', zIndex: 2 }} data-testid="house-fancy">
       <svg width="65" height="70" viewBox="0 0 65 70">
@@ -502,8 +579,8 @@ export function PetDisplay({ pet, cosmetics = [], gameState, playAnimation }: Pe
 
         {gameState?.activeBowl === 'bowl_basic' && <BowlBasic />}
         {gameState?.activeBowl === 'bowl_special' && <BowlSpecial />}
-        {gameState?.activeHouse === 'house_basic' && <HouseBasicSvg />}
-        {gameState?.activeHouse === 'house_fancy' && <HouseFancySvg />}
+        {gameState?.activeHouse === 'house_basic' && <HouseBasicSvg isSleeping={isNight} />}
+        {gameState?.activeHouse === 'house_fancy' && <HouseFancySvg isSleeping={isNight} />}
 
         <div className={`habitat-pet-wrapper ${wanderSpeed}`} data-testid="pet-wander">
           <div className="habitat-pet-container relative">
